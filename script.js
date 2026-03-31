@@ -1,69 +1,60 @@
-﻿const totalSteps = 5;
+// AC replacement estimator: four UI steps + final result (no repair logic)
+const totalSteps = 5;
 
 const quizSteps = [
   {
-    key: "service",
-    title: "Что нужно починить?",
+    key: "systemType",
+    title: "What type of system?",
     options: [
-      { label: "Кондиционер", value: "ac" },
-      { label: "Отопление", value: "heating" },
-      { label: "Бытовая техника", value: "appliance" },
+      { label: "Central AC", value: "central_ac" },
+      { label: "Ductless Mini Split", value: "ductless" },
     ],
   },
   {
-    key: "issue",
-    title: "Что случилось?",
+    key: "homeSize",
+    title: "Home size?",
     options: [
-      { label: "Не включается", value: "no_power" },
-      { label: "Плохо работает", value: "weak" },
-      { label: "Шумит", value: "noise" },
-      { label: "Не знаю", value: "unknown" },
+      { label: "Under 1000 sq ft", value: "under_1000" },
+      { label: "1000–2000 sq ft", value: "between_1000_2000" },
+      { label: "2000+ sq ft", value: "over_2000" },
     ],
   },
   {
-    key: "urgency",
-    title: "Когда нужно?",
+    key: "condition",
+    title: "Current system condition?",
     options: [
-      { label: "Срочно (сегодня)", value: "today" },
-      { label: "В ближайшие дни", value: "soon" },
-      { label: "Не срочно", value: "later" },
+      { label: "Still working", value: "working" },
+      { label: "Not working", value: "not_working" },
+      { label: "Old system (10+ years)", value: "old" },
     ],
   },
   {
-    key: "extra",
-    title: "Дополнительно",
+    key: "replacementTime",
+    title: "When do you need replacement?",
     options: [
-      { label: "Нужна диагностика на месте", value: "diagnostic_visit" },
-      { label: "Требуется гарантия на ремонт", value: "warranty" },
-      { label: "Нужна только консультация", value: "consultation" },
+      { label: "ASAP", value: "asap" },
+      { label: "This week", value: "this_week" },
+      { label: "Just researching", value: "researching" },
     ],
   },
 ];
 
-const pricingConfig = {
-  base: { min: 55, max: 120 },
-  service: {
-    ac: { min: 25, max: 85 },
-    heating: { min: 35, max: 95 },
-    appliance: { min: 20, max: 75 },
-  },
-  issue: {
-    no_power: { min: 35, max: 95 },
-    weak: { min: 25, max: 70 },
-    noise: { min: 15, max: 45 },
-    unknown: { min: 30, max: 80 },
-  },
-  urgency: {
-    today: { min: 30, max: 80 },
-    soon: { min: 10, max: 30 },
-    later: { min: 0, max: 0 },
-  },
-  extra: {
-    diagnostic_visit: { min: 15, max: 35 },
-    warranty: { min: 20, max: 45 },
-    consultation: { min: 5, max: 20 },
-  },
-};
+// Pricing is fixed in this version to match the required 3,500 – 8,000 range
+function formatCurrency(n) {
+  try {
+    return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n).replace("$", "$");
+  } catch {
+    return `$${Number(n).toLocaleString("en-US")}`;
+  }
+}
+
+function calculatePriceRange() {
+  // Fixed range per the specification: $3,500 – $8,000
+  return {
+    min: 3500,
+    max: 8000,
+  };
+}
 
 const ui = {
   screen: document.getElementById("screen"),
@@ -89,22 +80,11 @@ function roundToFive(value) {
 }
 
 function calculatePriceRange() {
-  let min = pricingConfig.base.min;
-  let max = pricingConfig.base.max;
-
-  Object.entries(answers).forEach(([stepKey, answerValue]) => {
-    const modifier = pricingConfig[stepKey]?.[answerValue];
-    if (!modifier) {
-      return;
-    }
-
-    min += modifier.min;
-    max += modifier.max;
-  });
-
+  // Fixed range per the specification: $3,500 – $8,000
+  // The estimator is now dedicated to AC replacement and does not depend on per-step modifiers.
   return {
-    min: roundToFive(min),
-    max: roundToFive(max),
+    min: 3500,
+    max: 8000,
   };
 }
 
@@ -138,7 +118,7 @@ function createOptionButton(option, index, stepKey) {
       </span>
       <span class="flex-1">
         <span class="block text-[17px] font-bold leading-tight text-slate-800 sm:text-lg">${option.label}</span>
-        <span class="mt-1 block text-sm font-medium text-slate-500">Нажмите, чтобы выбрать</span>
+      <span class="mt-1 block text-sm font-medium text-slate-500">Click to select</span>
       </span>
       <span class="flex h-8 w-8 flex-none items-center justify-center rounded-full border ${isSelected ? "border-accent-500 bg-accent-500 text-white" : "border-slate-300 bg-white text-slate-400"}">
         ${
@@ -172,10 +152,10 @@ function renderQuestionStep(step) {
 
 function renderResultStep() {
   const range = calculatePriceRange();
-  ui.questionTitle.textContent = "Ваш ориентировочный расчёт:";
+  ui.questionTitle.textContent = "Estimated cost";
   ui.optionsContainer.classList.add("hidden");
   ui.resultContainer.classList.remove("hidden");
-  ui.resultPrice.textContent = `$${range.min}–$${range.max}`;
+  ui.resultPrice.textContent = `${formatCurrency(range.min)} – ${formatCurrency(range.max)}`;
 }
 
 function renderCurrentStep() {
@@ -240,7 +220,7 @@ ui.leadForm.addEventListener("submit", (event) => {
   event.preventDefault();
   ui.leadForm.reset();
   closeLeadModal();
-  window.alert("Спасибо! Заявка отправлена, мы скоро свяжемся с вами.");
+  window.alert("Thank you! Your request has been submitted.");
 });
 
 renderCurrentStep();
