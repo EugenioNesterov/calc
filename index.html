@@ -3,13 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AC Replacement Cost Calculator</title>
+    <title>HVAC Quote Calculator</title>
+    <meta name="description" content="Get an instant HVAC replacement quote in under 60 seconds. Answer a few quick questions and we'll send your personalized estimate right away." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -17,7 +15,7 @@
           extend: {
             colors: {
               accent: {
-                50: "#eff5ff",
+                50:  "#eff5ff",
                 100: "#dbe8ff",
                 200: "#bfd5ff",
                 300: "#8cb5ff",
@@ -31,7 +29,7 @@
               soft: "0 16px 32px -22px rgba(17, 53, 125, 0.55)",
             },
             fontFamily: {
-              sans: ["Manrope", "sans-serif"],
+              sans:    ["Manrope", "sans-serif"],
               display: ["Sora", "Manrope", "sans-serif"],
             },
           },
@@ -39,193 +37,188 @@
       };
     </script>
     <style>
-      @keyframes floatUp {
-        from {
-          opacity: 0;
-          transform: translateY(12px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+      /* ─── slide transitions ─── */
+      @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(48px); }
+        to   { opacity: 1; transform: translateX(0);    }
+      }
+      @keyframes slideInLeft {
+        from { opacity: 0; transform: translateX(-48px); }
+        to   { opacity: 1; transform: translateX(0);     }
+      }
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(16px); }
+        to   { opacity: 1; transform: translateY(0);    }
+      }
+      @keyframes scaleIn {
+        from { opacity: 0; transform: scale(0.94); }
+        to   { opacity: 1; transform: scale(1);    }
       }
 
-      .option-enter {
-        animation: floatUp 0.4s ease forwards;
+      .anim-slide-right { animation: slideInRight 0.38s cubic-bezier(.22,.68,0,1.2) both; }
+      .anim-slide-left  { animation: slideInLeft  0.38s cubic-bezier(.22,.68,0,1.2) both; }
+      .anim-fade-up     { animation: fadeUp       0.35s ease both; }
+      .anim-scale-in    { animation: scaleIn      0.4s  cubic-bezier(.22,.68,0,1.2) both; }
+
+      /* stagger children */
+      .anim-child > *:nth-child(1)  { animation-delay: 0ms;   }
+      .anim-child > *:nth-child(2)  { animation-delay: 60ms;  }
+      .anim-child > *:nth-child(3)  { animation-delay: 120ms; }
+      .anim-child > *:nth-child(4)  { animation-delay: 180ms; }
+      .anim-child > *:nth-child(5)  { animation-delay: 240ms; }
+      .anim-child > *:nth-child(6)  { animation-delay: 300ms; }
+
+      /* ── Option card — minimal, no badges ── */
+      .option-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 1.15rem 1.5rem;
+        border-radius: .875rem;
+        border: 1.5px solid #e8edf5;
+        background: #fff;
+        cursor: pointer;
+        transition: border-color .15s, transform .12s, background .15s;
+        text-align: left;
+        font-family: inherit;
+      }
+      .option-card:hover {
+        border-color: #93c5fd;
+        background: #f8fbff;
+        transform: translateY(-1px);
+      }
+      .option-card.selected {
+        border-color: #1f6fff;
+        background: #eff5ff;
+      }
+      .option-card .label {
+        font-size: 1.0625rem;
+        font-weight: 600;
+        color: #1e293b;
+        line-height: 1.4;
+      }
+      /* checkmark icon inside selected card */
+      .option-card .check-icon {
+        flex-shrink: 0;
+        color: #1f6fff;
       }
 
-      .screen-exit {
-        opacity: 0;
-        transform: translateX(var(--exit-offset, 20px));
+      /* ── Typeform-style input ── */
+      .tf-input {
+        width: 100%;
+        border: 0;
+        border-bottom: 2px solid #e2e8f0;
+        background: transparent;
+        padding: 1rem 0;
+        font-size: 1.5rem;
+        font-weight: 500;
+        color: #1e293b;
+        outline: none;
+        transition: border-color .2s;
+        font-family: inherit;
+        caret-color: #1f6fff;
+      }
+      .tf-input::placeholder { color: #94a3b8; font-weight: 400; font-size: 1.3rem; }
+      .tf-input:focus { border-color: #1f6fff; }
+
+      /* progress bar */
+      #progressFill {
+        transition: width .5s cubic-bezier(.22,.68,0,1.2);
       }
 
-      .screen-enter {
-        opacity: 1;
-        transform: translateX(0);
+      /* ── result meta label ── */
+      .result-label {
+        display: block;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: #94a3b8;
+        margin-bottom: .2rem;
       }
+      .result-value {
+        font-size: .9375rem;
+        font-weight: 600;
+        color: #334155;
+      }
+      /* inline OK button */
+      .step-next-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        background: #1f6fff;
+        color: #fff;
+        border: none;
+        border-radius: .75rem;
+        padding: .85rem 2.5rem;
+        font-size: .9375rem;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: inherit;
+        transition: background .15s, transform .12s, opacity .15s;
+      }
+      .step-next-btn:hover:not(:disabled) { background: #1658d5; transform: translateY(-1px); }
+      .step-next-btn:disabled { opacity: .3; cursor: not-allowed; transform: none; }
+      .step-next-btn:focus-visible { outline: 3px solid #8cb5ff; outline-offset: 3px; }
+
+      /* pulse dot */
+      @keyframes pulse-ring {
+        0%   { transform: scale(.9); box-shadow: 0 0 0 0 rgba(31,111,255,.5); }
+        70%  { transform: scale(1);  box-shadow: 0 0 0 10px rgba(31,111,255,0); }
+        100% { transform: scale(.9); box-shadow: 0 0 0 0 rgba(31,111,255,0); }
+      }
+      .pulse-dot { animation: pulse-ring 2s infinite; }
+
+      /* hide scrollbar on step containers */
+      .step-content { -ms-overflow-style: none; scrollbar-width: none; }
+      .step-content::-webkit-scrollbar { display: none; }
     </style>
   </head>
-  <body class="relative min-h-screen overflow-x-hidden bg-[#f4f8ff] text-slate-900 antialiased">
-    <div class="pointer-events-none absolute -left-32 top-[-100px] h-80 w-80 rounded-full bg-accent-200/55 blur-3xl"></div>
-    <div class="pointer-events-none absolute -right-24 top-[35%] h-72 w-72 rounded-full bg-cyan-100/70 blur-3xl"></div>
+  <body class="relative min-h-screen overflow-x-hidden bg-white text-slate-900 antialiased font-sans">
 
-    <div class="mx-auto flex min-h-screen w-full max-w-6xl items-center justify-center px-4 py-10 sm:px-6 sm:py-14">
-      <main class="relative w-full max-w-3xl overflow-hidden rounded-[32px] border border-white/75 bg-white/92 p-7 shadow-card backdrop-blur sm:p-10">
-        <div class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-accent-300 via-accent-500 to-cyan-300"></div>
+    <!-- decorative blobs (very subtle on white) -->
+    <div class="pointer-events-none fixed -left-40 top-[-80px] h-96 w-96 rounded-full bg-accent-100/30 blur-3xl"></div>
+    <div class="pointer-events-none fixed -right-32 bottom-0 h-80 w-80 rounded-full bg-cyan-50/50 blur-3xl"></div>
 
-        <header class="mb-9 space-y-5 sm:mb-11 sm:space-y-6">
-          <div class="flex items-start justify-between gap-4">
-            <img
-              src="logo.svg"
-              alt="Big City logo"
-              class="h-auto w-36 sm:w-44"
-            />
-            <p id="stepIndicator" class="rounded-full border border-slate-200 bg-white px-3 py-1 text-sm font-bold text-slate-700">1/5</p>
-          </div>
+    <!-- ═══════════════════════════════════════
+         WRAPPER — full viewport height per step
+    ═══════════════════════════════════════ -->
+    <div class="flex min-h-screen flex-col">
 
-          <div class="space-y-3">
-            <div class="h-2.5 overflow-hidden rounded-full bg-slate-100">
-              <div
-                id="progressBar"
-                class="h-full w-[20%] rounded-full bg-gradient-to-r from-accent-500 to-accent-300 transition-all duration-500 ease-out"
-              ></div>
-            </div>
-            <p class="text-sm font-medium leading-relaxed text-slate-500">Answer a few questions to get a quick replacement estimate.</p>
-            <p class="text-xs font-semibold tracking-wide text-slate-400">Takes less than 1 minute</p>
-          </div>
-        </header>
+      <!-- TOP BAR -->
+      <header class="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-white/60 bg-white/80 px-5 py-3.5 backdrop-blur sm:px-8">
+        <img src="logo.svg" alt="Big City logo" class="h-auto w-32 sm:w-40" />
 
-        <section id="screen" class="screen-enter min-h-[370px] transition-all duration-300 ease-out sm:min-h-[405px]">
-          <h1 id="questionTitle" class="mb-7 font-display text-3xl font-extrabold leading-tight text-slate-900 sm:mb-9 sm:text-4xl"></h1>
+        <div class="flex items-center gap-3">
+          <span id="stepLabel" class="text-xs font-semibold text-slate-400"></span>
+          <span id="stepIndicator" class="rounded-full border border-slate-200 bg-white px-3 py-1 text-sm font-bold text-slate-700">1/6</span>
+        </div>
+      </header>
 
-          <div id="optionsContainer" class="grid gap-3.5 sm:gap-4"></div>
+      <!-- PROGRESS BAR (thin accent line) -->
+      <div class="h-1 w-full bg-slate-100">
+        <div id="progressFill" class="h-full rounded-r-full bg-gradient-to-r from-accent-500 to-accent-300" style="width:0%"></div>
+      </div>
 
-          <div id="resultContainer" class="hidden rounded-3xl border border-accent-100 bg-gradient-to-br from-accent-50 via-white to-accent-50/70 p-7 sm:p-10">
-            <p class="text-xs font-bold uppercase tracking-[0.12em] text-accent-600">Your estimated replacement cost</p>
-            <p class="mt-1 text-[13px] font-medium text-slate-400">Based on your answers</p>
-            <p id="resultPrice" class="mt-4 font-display text-6xl font-extrabold leading-none tracking-tight text-slate-900 sm:text-7xl"></p>
-            <div class="mt-5 mb-2 h-px bg-slate-100"></div>
-            <div class="mt-4 flex flex-col gap-1.5 text-[13px] font-medium text-slate-500">
-              <p>✔ Free estimate</p>
-              <p>✔ Licensed technicians</p>
-              <p>✔ Same-day service available</p>
-            </div>
-            <p class="mt-2 text-xs font-semibold text-slate-500">⭐ Over 1,000 homeowners served</p>
-            <p class="mt-1 text-xs font-medium text-slate-400">Final price depends on inspection</p>
-            <button
-              id="openLeadModalButton"
-              type="button"
-              class="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-accent-600 to-accent-500 px-5 py-3.5 text-base font-bold text-white shadow-soft transition duration-200 hover:-translate-y-0.5 hover:from-accent-700 hover:to-accent-600 hover:shadow-card focus:outline-none focus:ring-4 focus:ring-accent-100"
-            >
-              Get my free quote
-            </button>
-            <p class="mt-2.5 text-center text-xs font-medium text-slate-400">No spam. Just a quick callback.</p>
-          </div>
-        </section>
-
-        <footer class="mt-9 flex items-center justify-between gap-4 border-t border-slate-100 pt-6 sm:mt-11 sm:pt-7">
-          <button
-            id="backButton"
-            type="button"
-            class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 transition duration-200 hover:-translate-y-0.5 hover:border-accent-300 hover:bg-accent-50/60 hover:text-accent-700 disabled:cursor-not-allowed disabled:opacity-35"
-          >
-            Back
-          </button>
-          <p class="text-right text-xs font-medium text-slate-400 sm:text-sm">Select an option to continue</p>
-        </footer>
+      <!-- ─── STEP CONTAINER ─── -->
+      <main id="stepContainer" class="flex flex-1 flex-col items-center justify-center px-5 py-12 sm:px-8">
+        <!-- steps are injected here by JS -->
       </main>
-    </div>
 
-    <div id="leadModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 sm:p-6">
-      <button
-        id="modalBackdrop"
-        type="button"
-        aria-label="Close modal"
-        class="absolute inset-0 bg-slate-900/45 backdrop-blur-sm"
-      ></button>
+      <!-- BOTTOM NAV — back only; OK button lives inside each step -->
+      <footer class="flex items-center justify-between gap-4 border-t border-slate-100 bg-white px-5 py-3.5 sm:px-8">
+        <button
+          id="backButton"
+          type="button"
+          class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500 transition duration-150 hover:border-slate-300 hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-30"
+        >
+          ← Back
+        </button>
 
-      <section class="relative z-10 w-full max-w-lg rounded-3xl border border-white/70 bg-white p-6 shadow-card sm:p-8">
-        <div class="mb-7 flex items-start justify-between gap-4">
-          <div>
-            <p class="text-xs font-bold uppercase tracking-[0.1em] text-accent-700">Request</p>
-            <h2 class="mt-2 font-display text-2xl font-extrabold text-slate-900 sm:text-3xl">Enter your details</h2>
-          </div>
-          <button
-            id="closeLeadModalButton"
-            type="button"
-            class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:border-slate-300 hover:text-slate-700 focus:outline-none focus:ring-4 focus:ring-accent-100"
-            aria-label="Close form"
-          >
-            <span class="text-lg leading-none">×</span>
-          </button>
-        </div>
-
-        <p class="-mt-2 mb-5 text-xs font-medium text-slate-400">Takes less than 30 seconds</p>
-
-        <form id="leadForm" class="space-y-4.5">
-          <div class="grid gap-4.5 sm:grid-cols-2">
-            <label class="block">
-              <span class="mb-1.5 block text-sm font-semibold text-slate-700">First Name</span>
-              <input
-                type="text"
-                name="firstName"
-                required
-                class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-accent-400 focus:ring-4 focus:ring-accent-100"
-                placeholder="John"
-              />
-            </label>
-
-            <label class="block">
-              <span class="mb-1.5 block text-sm font-semibold text-slate-700">Last Name</span>
-              <input
-                type="text"
-                name="lastName"
-                required
-                class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-accent-400 focus:ring-4 focus:ring-accent-100"
-                placeholder="Doe"
-              />
-            </label>
-          </div>
-
-          <label class="block">
-            <span class="mb-1.5 block text-sm font-semibold text-slate-700">Phone Number</span>
-            <input
-              type="tel"
-              name="phone"
-              required
-              class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-accent-400 focus:ring-4 focus:ring-accent-100"
-              placeholder="(555) 123-4567"
-            />
-          </label>
-
-          <label class="block">
-            <span class="mb-1.5 block text-sm font-semibold text-slate-700">Email</span>
-            <input
-              type="email"
-              name="email"
-              required
-              class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-accent-400 focus:ring-4 focus:ring-accent-100"
-              placeholder="email@example.com"
-            />
-          </label>
-
-          <button
-            type="submit"
-            class="mt-3 inline-flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-accent-600 to-accent-500 px-5 py-3 text-base font-bold text-white shadow-soft transition duration-200 hover:-translate-y-0.5 hover:from-accent-700 hover:to-accent-600 hover:shadow-card focus:outline-none focus:ring-4 focus:ring-accent-100"
-          >
-            Submit request
-          </button>
-          <p class="mt-2.5 text-center text-xs font-medium text-slate-400">No spam. Just a quick callback.</p>
-        </form>
-
-        <div id="leadSuccessMessage" class="hidden flex-col items-center justify-center py-8 text-center">
-          <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="h-7 w-7 text-emerald-500"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-          </div>
-          <p class="font-display text-xl font-extrabold text-slate-900">Request sent!</p>
-          <p class="mt-3 text-sm font-medium leading-relaxed text-slate-500">Thank you! Our team will contact you<br>within 15 minutes.</p>
-        </div>
-      </section>
+        <!-- nextButton kept in DOM for JS ref but hidden visually -->
+        <button id="nextButton" type="button" class="hidden" disabled>OK</button>
+      </footer>
     </div>
 
     <script src="script.js"></script>
