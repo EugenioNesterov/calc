@@ -1,0 +1,212 @@
+﻿<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Калькулятор стоимости ремонта</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              accent: {
+                50: "#eff5ff",
+                100: "#dbe8ff",
+                200: "#bfd5ff",
+                300: "#8cb5ff",
+                500: "#1f6fff",
+                600: "#1658d5",
+                700: "#1448ad",
+              },
+            },
+            boxShadow: {
+              card: "0 28px 60px -30px rgba(17, 53, 125, 0.42)",
+              soft: "0 16px 32px -22px rgba(17, 53, 125, 0.55)",
+            },
+            fontFamily: {
+              sans: ["Manrope", "sans-serif"],
+              display: ["Sora", "Manrope", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      @keyframes floatUp {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .option-enter {
+        animation: floatUp 0.4s ease forwards;
+      }
+
+      .screen-exit {
+        opacity: 0;
+        transform: translateX(var(--exit-offset, 20px));
+      }
+
+      .screen-enter {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    </style>
+  </head>
+  <body class="relative min-h-screen overflow-x-hidden bg-[#f4f8ff] text-slate-900 antialiased">
+    <div class="pointer-events-none absolute -left-32 top-[-100px] h-80 w-80 rounded-full bg-accent-200/55 blur-3xl"></div>
+    <div class="pointer-events-none absolute -right-24 top-[35%] h-72 w-72 rounded-full bg-cyan-100/70 blur-3xl"></div>
+
+    <div class="mx-auto flex min-h-screen w-full max-w-6xl items-center justify-center px-4 py-10 sm:px-6 sm:py-14">
+      <main class="relative w-full max-w-3xl overflow-hidden rounded-[32px] border border-white/75 bg-white/92 p-6 shadow-card backdrop-blur sm:p-9">
+        <div class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-accent-300 via-accent-500 to-cyan-300"></div>
+
+        <header class="mb-8 space-y-5 sm:mb-10 sm:space-y-6">
+          <div class="flex items-start justify-between gap-4">
+            <img
+              src="logo.svg"
+              alt="Логотип Big City"
+              class="h-auto w-36 sm:w-44"
+            />
+            <p id="stepIndicator" class="rounded-full border border-slate-200 bg-white px-3 py-1 text-sm font-bold text-slate-700">1/5</p>
+          </div>
+
+          <div class="space-y-3">
+            <div class="h-2.5 overflow-hidden rounded-full bg-slate-100">
+              <div
+                id="progressBar"
+                class="h-full w-[20%] rounded-full bg-gradient-to-r from-accent-500 to-accent-300 transition-all duration-500 ease-out"
+              ></div>
+            </div>
+            <p class="text-sm font-medium text-slate-500">Ответьте на несколько вопросов, чтобы получить ориентировочную стоимость.</p>
+          </div>
+        </header>
+
+        <section id="screen" class="screen-enter min-h-[360px] transition-all duration-300 ease-out sm:min-h-[390px]">
+          <h1 id="questionTitle" class="mb-6 font-display text-3xl font-extrabold leading-tight text-slate-900 sm:mb-8 sm:text-4xl"></h1>
+
+          <div id="optionsContainer" class="grid gap-3.5 sm:gap-4"></div>
+
+          <div id="resultContainer" class="hidden rounded-3xl border border-accent-100 bg-gradient-to-br from-accent-50 via-white to-accent-50/70 p-6 sm:p-8">
+            <p class="text-xs font-bold uppercase tracking-[0.1em] text-accent-700">Ваш ориентировочный расчёт</p>
+            <p id="resultPrice" class="mt-3 font-display text-5xl font-extrabold text-slate-900 sm:text-6xl"></p>
+            <p class="mt-4 text-sm leading-relaxed text-slate-600 sm:text-base">Точная стоимость зависит от диагностики.</p>
+            <button
+              id="openLeadModalButton"
+              type="button"
+              class="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-accent-600 to-accent-500 px-5 py-3.5 text-base font-bold text-white shadow-soft transition hover:from-accent-700 hover:to-accent-600 focus:outline-none focus:ring-4 focus:ring-accent-100"
+            >
+              Оставить заявку
+            </button>
+          </div>
+        </section>
+
+        <footer class="mt-8 flex items-center justify-between gap-4 border-t border-slate-100 pt-6 sm:mt-10 sm:pt-7">
+          <button
+            id="backButton"
+            type="button"
+            class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:-translate-y-0.5 hover:border-accent-300 hover:text-accent-700 disabled:cursor-not-allowed disabled:opacity-35"
+          >
+            Назад
+          </button>
+          <p class="text-right text-xs font-medium text-slate-400 sm:text-sm">Выберите вариант, чтобы перейти дальше</p>
+        </footer>
+      </main>
+    </div>
+
+    <div id="leadModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 sm:p-6">
+      <button
+        id="modalBackdrop"
+        type="button"
+        aria-label="Закрыть"
+        class="absolute inset-0 bg-slate-900/45 backdrop-blur-sm"
+      ></button>
+
+      <section class="relative z-10 w-full max-w-lg rounded-3xl border border-white/70 bg-white p-6 shadow-card sm:p-8">
+        <div class="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-[0.1em] text-accent-700">Заявка</p>
+            <h2 class="mt-2 font-display text-2xl font-extrabold text-slate-900 sm:text-3xl">Оставьте ваши данные</h2>
+          </div>
+          <button
+            id="closeLeadModalButton"
+            type="button"
+            class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:border-slate-300 hover:text-slate-700 focus:outline-none focus:ring-4 focus:ring-accent-100"
+            aria-label="Закрыть форму"
+          >
+            <span class="text-lg leading-none">×</span>
+          </button>
+        </div>
+
+        <form id="leadForm" class="space-y-4">
+          <div class="grid gap-4 sm:grid-cols-2">
+            <label class="block">
+              <span class="mb-1.5 block text-sm font-semibold text-slate-700">Имя</span>
+              <input
+                type="text"
+                name="firstName"
+                required
+                class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-accent-400 focus:ring-4 focus:ring-accent-100"
+                placeholder="Иван"
+              />
+            </label>
+
+            <label class="block">
+              <span class="mb-1.5 block text-sm font-semibold text-slate-700">Фамилия</span>
+              <input
+                type="text"
+                name="lastName"
+                required
+                class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-accent-400 focus:ring-4 focus:ring-accent-100"
+                placeholder="Иванов"
+              />
+            </label>
+          </div>
+
+          <label class="block">
+            <span class="mb-1.5 block text-sm font-semibold text-slate-700">Номер телефона</span>
+            <input
+              type="tel"
+              name="phone"
+              required
+              class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-accent-400 focus:ring-4 focus:ring-accent-100"
+              placeholder="+7 (___) ___-__-__"
+            />
+          </label>
+
+          <label class="block">
+            <span class="mb-1.5 block text-sm font-semibold text-slate-700">Почта</span>
+            <input
+              type="email"
+              name="email"
+              required
+              class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-accent-400 focus:ring-4 focus:ring-accent-100"
+              placeholder="email@example.com"
+            />
+          </label>
+
+          <button
+            type="submit"
+            class="mt-2 inline-flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-accent-600 to-accent-500 px-5 py-3 text-base font-bold text-white shadow-soft transition hover:from-accent-700 hover:to-accent-600 focus:outline-none focus:ring-4 focus:ring-accent-100"
+          >
+            Отправить заявку
+          </button>
+        </form>
+      </section>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
