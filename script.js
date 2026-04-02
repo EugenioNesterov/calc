@@ -39,8 +39,6 @@ const stepContainer = document.getElementById("stepContainer");
 const progressFill  = document.getElementById("progressFill");
 const stepIndicator = document.getElementById("stepIndicator");
 const stepLabel     = document.getElementById("stepLabel");
-const backButton    = document.getElementById("backButton");
-const nextButton    = document.getElementById("nextButton");
 
 // ─── Validation ──────────────────────────
 function isStepValid(stepIndex) {
@@ -72,13 +70,12 @@ function updateProgress() {
   const currentPath = getActivePath();
   const currentStepIndex = currentPath[pathIndex];
   const isResult = currentStepIndex === 8;
-  const questionCount = currentPath.length - 1; // Total questions before result
+  const questionCount = currentPath.length - 1;
 
   if (isResult) {
     progressFill.style.width  = "100%";
     stepIndicator.textContent = "Done!";
     stepLabel.textContent     = "";
-    backButton.disabled       = false;
     return;
   }
 
@@ -88,38 +85,72 @@ function updateProgress() {
   progressFill.style.width  = `${pct}%`;
   stepIndicator.textContent = `${humanStep}/${questionCount}`;
   stepLabel.textContent     = `Step ${humanStep} of ${questionCount}`;
-  backButton.disabled       = pathIndex === 0;
 }
 
-// ─── Inline OK button HTML ───────────────────────────
-function stepNextBtn(disabled = true) {
-  return `
-    <div class="flex flex-col items-center gap-2 mt-10">
-      <button type="button" class="step-next-btn" ${disabled ? "disabled" : ""}>
-        OK&nbsp;&nbsp;→
-      </button>
-      <p class="text-xs text-slate-400">press <kbd class="font-mono bg-slate-100 px-1 py-0.5 rounded text-[11px]">Enter ↵</kbd></p>
-    </div>`;
+// ─── Умные встроенные элементы навигации ─────────────
+// stepIndex 0-4: карточки (авто-переход) → только «Back»
+// stepIndex 5-7: текстовые поля → «Back» + «OK»
+function renderStepControls(stepIndex, disabled = true) {
+  const isCardStep  = stepIndex >= 0 && stepIndex <= 4;
+  const isInputStep = stepIndex >= 5 && stepIndex <= 7;
+  const isFirstStep = pathIndex === 0;
+
+  // ── Кнопка «Back» — вторичный стиль ──────────────────
+  const backBtn = `
+    <button
+      type="button"
+      class="step-back-btn w-full flex items-center justify-center py-3.5 rounded
+             bg-slate-100 text-sm font-bold text-slate-600 uppercase tracking-wide
+             transition hover:bg-slate-200 hover:text-brand-blue"
+    >← Back</button>`;
+
+  // ── Кнопка «OK» — первичный brand-red стиль ──────────
+  const okBtn = `
+    <button
+      type="button"
+      class="step-next-btn w-full flex items-center justify-center py-3.5"
+      ${disabled ? "disabled" : ""}
+    >OK &nbsp;→</button>`;
+
+  if (isCardStep) {
+    // На первом шаге некуда возвращаться — убираем Back
+    if (isFirstStep) return "";
+    // Одна кнопка — центрируем, не растягиваем
+    return `<div class="flex justify-center mt-8">${backBtn.replace("w-full", "px-8")}</div>`;
+  }
+
+  if (isInputStep) {
+    // Две кнопки — равноширинная двухколоночная сетка
+    return `
+      <div class="w-full grid grid-cols-2 gap-4 mt-8">
+        ${backBtn}
+        ${okBtn}
+      </div>`;
+  }
+
+  return ""; // шаг 8 (результат) — управляется самим рендерером
 }
 
 // ─── Option card HTML ─────────────────────
-function optionCard(label, stateKey) {
+// layout: 'vertical' (квадратная сетка) | 'horizontal' (полноширинная строка)
+function optionCard(label, stateKey, layout = 'horizontal') {
   const selected = answers[stateKey] === label;
   return `
     <button
       type="button"
       role="radio"
       aria-checked="${selected}"
-      class="option-card ${selected ? "selected" : ""} anim-fade-up"
+      class="option-card ${layout} ${selected ? 'selected' : ''} anim-fade-up"
       data-key="${stateKey}"
       data-value="${label}"
+      data-layout="${layout}"
     >
       <span class="label">${label}</span>
       ${selected
-        ? `<svg class="check-icon w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+        ? `<svg class="check-icon" fill="currentColor" viewBox="0 0 20 20">
              <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 01.006 1.414l-7 7a1 1 0 01-1.42-.004L4.79 10.17a1 1 0 111.42-1.404l2.79 2.823 6.29-6.294a1 1 0 011.414-.005z" clip-rule="evenodd"/>
            </svg>`
-        : `<span class="w-5 h-5 flex-shrink-0"></span>`
+        : `<span class="check-placeholder"></span>`
       }
     </button>`;
 }
@@ -129,8 +160,8 @@ function optionCard(label, stateKey) {
 function renderStep0() {
   const opts = ["Single-Family", "Condo", "Mobile", "Townhouse"];
   return `
-    <div class="w-full max-w-lg mx-auto">
-      <div class="text-center mb-12 anim-fade-up">
+    <div class="w-full max-w-2xl mx-auto">
+      <div class="text-center mb-10 anim-fade-up">
         <h1 class="font-display text-3xl sm:text-4xl font-black leading-tight text-brand-blue uppercase tracking-tight">
           Select the type of home that you own
         </h1>
@@ -138,26 +169,26 @@ function renderStep0() {
           To provide the most accurate estimate, we'll start with a few quick details about your home...
         </p>
       </div>
-      <div class="flex flex-col gap-3 anim-child" role="radiogroup">
-        ${opts.map(opt => optionCard(opt, "homeType")).join("")}
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 anim-child" role="radiogroup">
+        ${opts.map(opt => optionCard(opt, "homeType", "vertical")).join("")}
       </div>
-      ${stepNextBtn(!isStepValid(0))}
+      ${renderStepControls(0, !isStepValid(0))}
     </div>`;
 }
 
 function renderStep1() {
   const opts = ["Furnace", "A/C", "Mini-Split", "Heat Pump", "A/C & Furnace"];
   return `
-    <div class="w-full max-w-lg mx-auto">
-      <div class="text-center mb-12 anim-fade-up">
+    <div class="w-full max-w-2xl mx-auto">
+      <div class="text-center mb-10 anim-fade-up">
         <h1 class="font-display text-3xl sm:text-4xl font-black leading-tight text-brand-blue uppercase tracking-tight">
           Which type of system would you like a quote for?
         </h1>
       </div>
-      <div class="flex flex-col gap-3 anim-child" role="radiogroup">
-        ${opts.map(opt => optionCard(opt, "systemType")).join("")}
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 anim-child" role="radiogroup">
+        ${opts.map(opt => optionCard(opt, "systemType", "vertical")).join("")}
       </div>
-      ${stepNextBtn(!isStepValid(1))}
+      ${renderStepControls(1, !isStepValid(1))}
     </div>`;
 }
 
@@ -171,25 +202,25 @@ function renderStep2() {
         </h1>
       </div>
       <div class="flex flex-col gap-3 anim-child" role="radiogroup">
-        ${opts.map(opt => optionCard(opt, "zones")).join("")}
+        ${opts.map(opt => optionCard(opt, "zones", "horizontal")).join("")}
       </div>
-      ${stepNextBtn(!isStepValid(2))}
+      ${renderStepControls(2, !isStepValid(2))}
     </div>`;
 }
 
 function renderStep3() {
   const opts = ["New Installation", "Replacement"];
   return `
-    <div class="w-full max-w-lg mx-auto">
-      <div class="text-center mb-12 anim-fade-up">
+    <div class="w-full max-w-2xl mx-auto">
+      <div class="text-center mb-10 anim-fade-up">
         <h1 class="font-display text-3xl sm:text-4xl font-black leading-tight text-brand-blue uppercase tracking-tight">
           Are you looking to replace an existing system or add a new one?
         </h1>
       </div>
-      <div class="flex flex-col gap-3 anim-child" role="radiogroup">
-        ${opts.map(opt => optionCard(opt, "replaceNew")).join("")}
+      <div class="grid grid-cols-2 gap-4 max-w-md mx-auto anim-child" role="radiogroup">
+        ${opts.map(opt => optionCard(opt, "replaceNew", "vertical")).join("")}
       </div>
-      ${stepNextBtn(!isStepValid(3))}
+      ${renderStepControls(3, !isStepValid(3))}
     </div>`;
 }
 
@@ -203,9 +234,9 @@ function renderStep4() {
         </h1>
       </div>
       <div class="grid grid-cols-2 gap-3 anim-child" role="radiogroup">
-        ${opts.map(opt => optionCard(opt, "sqFootage")).join("")}
+        ${opts.map(opt => optionCard(opt, "sqFootage", "horizontal")).join("")}
       </div>
-      ${stepNextBtn(!isStepValid(4))}
+      ${renderStepControls(4, !isStepValid(4))}
     </div>`;
 }
 
@@ -222,7 +253,7 @@ function renderStep5() {
         <input id="zipInput" type="text" inputmode="numeric" maxlength="10" placeholder="e.g. 92129" value="${answers.zipCode}" class="tf-input" autocomplete="postal-code"/>
         <p class="mt-3 text-xs font-bold uppercase tracking-wide text-slate-400">We use your zip to find eligible local rebates.</p>
       </div>
-      ${stepNextBtn(!isStepValid(5))}
+      ${renderStepControls(5, !isStepValid(5))}
     </div>`;
 }
 
@@ -244,7 +275,7 @@ function renderStep6() {
           <input id="lastNameInput" type="text" placeholder="DOE" value="${answers.lastName}" class="tf-input uppercase" autocomplete="family-name"/>
         </div>
       </div>
-      ${stepNextBtn(!isStepValid(6))}
+      ${renderStepControls(6, !isStepValid(6))}
     </div>`;
 }
 
@@ -269,7 +300,7 @@ function renderStep7() {
           <input id="emailInput" type="email" inputmode="email" placeholder="email@example.com" value="${answers.email}" class="tf-input" autocomplete="email"/>
         </div>
       </div>
-      ${stepNextBtn(!isStepValid(7))}
+      ${renderStepControls(7, !isStepValid(7))}
     </div>`;
 }
 
@@ -526,7 +557,9 @@ function renderStep(dir = 1) {
 
 // ─── Event Listeners ─────────────────────────────────
 function attachListeners() {
+  // Динамические кнопки навигации внутри шага
   document.querySelector(".step-next-btn")?.addEventListener("click", tryAdvance);
+  document.querySelector(".step-back-btn")?.addEventListener("click", () => advance(-1));
 
   document.querySelectorAll(".option-card").forEach(card => {
     card.addEventListener("click", () => {
@@ -540,15 +573,15 @@ function attachListeners() {
         c.setAttribute("aria-checked", String(isSel));
 
         const svgEl   = c.querySelector("svg.check-icon");
-        const emptyEl = c.querySelector("span.w-5.h-5.flex-shrink-0");
+        const emptyEl = c.querySelector("span.check-placeholder");
         if (isSel && !svgEl) {
           emptyEl?.insertAdjacentHTML("afterend", `
-            <svg class="check-icon w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <svg class="check-icon" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 01.006 1.414l-7 7a1 1 0 01-1.42-.004L4.79 10.17a1 1 0 111.42-1.404l2.79 2.823 6.29-6.294a1 1 0 011.414-.005z" clip-rule="evenodd"/>
             </svg>`);
           emptyEl?.remove();
         } else if (!isSel && svgEl) {
-          svgEl.insertAdjacentHTML("afterend", `<span class="w-5 h-5 flex-shrink-0"></span>`);
+          svgEl.insertAdjacentHTML("afterend", `<span class="check-placeholder"></span>`);
           svgEl.remove();
         }
       });
@@ -609,8 +642,7 @@ function tryAdvance() {
   if (isStepValid(currentStepIndex)) advance(1);
 }
 
-backButton.addEventListener("click", () => advance(-1));
-nextButton.addEventListener("click", tryAdvance);
+// Глобальные кнопки footer удалены — навигация встроена в каждый шаг
 
 // ─── Boot ─────────────────────────────────────────────
 renderStep(1);

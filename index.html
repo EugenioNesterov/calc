@@ -15,11 +15,11 @@
           extend: {
             colors: {
               brand: {
-                blue: "#0e2a47",   // Тот самый суровый синий
-                light: "#1a497d",  // Синий посветлее для ховера
-                red: "#e31837",    // Агрессивный красный для кнопок
-                redHover: "#c1122b",
-                gray: "#f4f6f9",   // Технический серый фон
+                blue: "#0e2a47",   
+                light: "#1a497d",  
+                red: "#ff6b00",    /* Оранжевый цвет для всех акцентов, кнопок и прогресс-бара */
+                redHover: "#e66000",
+                gray: "#f4f6f9",   
               },
             },
             fontFamily: {
@@ -49,39 +49,83 @@
       .anim-child > *:nth-child(5)  { animation-delay: 200ms; }
       .anim-child > *:nth-child(6)  { animation-delay: 250ms; }
 
-      /* ─── Жесткие индустриальные карточки ─── */
+      /* ─── Базовые стили карточки (общие для всех вариантов) ─── */
       .option-card {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        padding: 1.25rem 1.5rem;
-        border-radius: 0.375rem; /* Квадратные углы */
+        border-radius: 0.5rem;
         border: 2px solid #cbd5e1;
         background: #fff;
         cursor: pointer;
-        transition: all .15s ease-in-out;
-        text-align: left;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        transition: border-color .15s ease-in-out,
+                    background .15s ease-in-out,
+                    transform .15s ease-in-out,
+                    box-shadow .15s ease-in-out;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.04);
       }
       .option-card:hover {
         border-color: #1a497d;
         background: #f8fafc;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 14px rgba(0,0,0,0.08);
       }
       .option-card.selected {
         border-color: #0e2a47;
-        background: #eef2f6;
+        background: #e8f0f8;
+        box-shadow: 0 0 0 3px rgba(14,42,71,0.12);
       }
-      .option-card .label {
+
+      /* ─── Вертикальный вариант: квадратные карточки в сетке ─── */
+      .option-card.vertical {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        aspect-ratio: 1 / 1;
+        padding: 0.75rem;
+        text-align: center;
+      }
+      .option-card.vertical .label {
+        font-size: 0.8125rem;
+        font-weight: 700;
+        color: #0e2a47;
+        line-height: 1.3;
+        word-break: break-word;
+        hyphens: auto;
+      }
+      .option-card.vertical .check-icon {
+        flex-shrink: 0;
+        color: #ff6b00;
+        width: 1.125rem;
+        height: 1.125rem;
+      }
+      .option-card.vertical .check-placeholder {
+        display: none;
+      }
+
+      /* ─── Горизонтальный вариант: полноширинные строки ─── */
+      .option-card.horizontal {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 1.25rem 1.5rem;
+        text-align: left;
+      }
+      .option-card.horizontal .label {
         font-size: 1.125rem;
         font-weight: 700;
         color: #0e2a47;
       }
-      .option-card .check-icon {
+      .option-card.horizontal .check-icon {
         flex-shrink: 0;
-        color: #e31837; /* Красная галочка вместо синей */
+        color: #ff6b00;
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+      .option-card.horizontal .check-placeholder {
+        width: 1.25rem;
+        height: 1.25rem;
+        flex-shrink: 0;
       }
 
       /* ─── Инпуты ─── */
@@ -123,7 +167,7 @@
         display: inline-flex;
         align-items: center;
         gap: .5rem;
-        background: #e31837;
+        background: #ff6b00;
         color: #fff;
         border: none;
         border-radius: 0.375rem;
@@ -133,37 +177,56 @@
         text-transform: uppercase;
         cursor: pointer;
         transition: all .15s;
-        box-shadow: 0 4px 10px rgba(227, 24, 55, 0.3);
+        box-shadow: 0 4px 10px rgba(255, 107, 0, 0.3);
       }
-      .step-next-btn:hover:not(:disabled) { background: #c1122b; transform: translateY(-1px); box-shadow: 0 6px 14px rgba(227, 24, 55, 0.4); }
+      .step-next-btn:hover:not(:disabled) { background: #e66000; transform: translateY(-1px); box-shadow: 0 6px 14px rgba(255, 107, 0, 0.4); }
       .step-next-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
-      .step-next-btn:focus-visible { outline: 3px solid #fca5a5; outline-offset: 3px; }
+      .step-next-btn:focus-visible { outline: 3px solid #fdba74; outline-offset: 3px; }
 
       @keyframes pulse-ring {
-        0%   { transform: scale(.85); box-shadow: 0 0 0 0 rgba(227,24,55,.6); }
-        70%  { transform: scale(1);  box-shadow: 0 0 0 10px rgba(227,24,55,0); }
-        100% { transform: scale(.85); box-shadow: 0 0 0 0 rgba(227,24,55,0); }
+        0%   { transform: scale(.85); box-shadow: 0 0 0 0 rgba(255, 107, 0, .6); }
+        70%  { transform: scale(1);  box-shadow: 0 0 0 10px rgba(255, 107, 0, 0); }
+        100% { transform: scale(.85); box-shadow: 0 0 0 0 rgba(255, 107, 0, 0); }
       }
       .pulse-dot { animation: pulse-ring 2s infinite; }
       
       .step-content { -ms-overflow-style: none; scrollbar-width: none; }
       .step-content::-webkit-scrollbar { display: none; }
+
+      /* ─── Marquee (бегущая строка партнёров) ─── */
+      @keyframes marquee {
+        from { transform: translateX(0); }
+        to   { transform: translateX(-50%); }
+      }
+
+      .marquee-track {
+        display: flex;
+        gap: 1.5rem;           /* gap-6 = 24px */
+        width: max-content;    /* растягивается под 30 логотипов */
+        animation: marquee 35s linear infinite;
+        will-change: transform;
+      }
+
+      /* Пауза при наведении мыши */
+      .marquee-wrapper:hover .marquee-track {
+        animation-play-state: paused;
+      }
     </style>
   </head>
   <body class="relative min-h-screen overflow-x-hidden bg-brand-gray text-slate-900 antialiased font-sans">
 
     <div class="flex min-h-screen flex-col">
 
-  <header class="sticky top-0 z-20 flex items-center justify-between gap-4 border-b-4 border-brand-red bg-brand-blue px-5 py-3 shadow-md sm:px-8">
-  <div class="flex items-center">
-    <img src="logo.svg" alt="Big City Logo" class="h-16 sm:h-20 w-auto object-contain" />
-  </div>
+      <header class="sticky top-0 z-20 flex items-center justify-between gap-4 bg-white px-5 py-3 shadow-sm sm:px-8">
+        <div class="flex items-center">
+          <img src="logo.svg" alt="Big City Logo" class="h-16 sm:h-20 w-auto object-contain" />
+        </div>
 
-  <div class="flex items-center gap-3">
-    <span id="stepLabel" class="hidden sm:inline-block text-xs font-bold uppercase tracking-wider text-slate-300"></span>
-    <span id="stepIndicator" class="rounded border border-slate-600 bg-slate-800 px-3 py-1 text-sm font-bold text-white">1/6</span>
-  </div>
-</header>
+        <div class="flex items-center gap-3">
+          <span id="stepLabel" class="hidden sm:inline-block text-xs font-bold uppercase tracking-wider text-slate-400"></span>
+          <span id="stepIndicator" class="rounded border border-slate-300 bg-slate-100 px-3 py-1 text-sm font-bold text-brand-blue">1/6</span>
+        </div>
+      </header>
 
       <div class="h-1.5 w-full bg-slate-200">
         <div id="progressFill" class="h-full bg-brand-red" style="width:0%"></div>
@@ -172,17 +235,63 @@
       <main id="stepContainer" class="flex flex-1 flex-col items-center justify-center px-5 py-12 sm:px-8">
         </main>
 
-      <footer class="flex items-center justify-between gap-4 border-t-2 border-slate-200 bg-white px-5 py-4 sm:px-8">
-        <button
-          id="backButton"
-          type="button"
-          class="inline-flex items-center gap-1.5 rounded bg-slate-100 px-4 py-2.5 text-sm font-bold text-slate-600 transition duration-150 hover:bg-slate-200 hover:text-brand-blue disabled:cursor-not-allowed disabled:opacity-40 uppercase"
-        >
-          ← Back
-        </button>
+      <!-- ═══ СЕКЦИЯ ПАРТНЁРОВ ═══ -->
+      <section class="w-full bg-[#2868d7] py-10 overflow-hidden" aria-label="Our Partners">
 
-        <button id="nextButton" type="button" class="hidden" disabled>OK</button>
-      </footer>
+        <!-- Заголовок -->
+        <div class="flex items-center gap-4 mb-8 px-5 sm:px-8">
+          <span class="block w-1.5 h-14 rounded-full bg-brand-red flex-shrink-0"></span>
+          <h2 class="font-display text-5xl sm:text-6xl font-black uppercase tracking-tight text-white leading-none">
+            Our Partners
+          </h2>
+        </div>
+
+        <!-- Обёртка: overflow-hidden обрезает трек по краям -->
+        <div class="marquee-wrapper overflow-hidden">
+
+          <!-- Трек: 30 логотипов (15 оригинальных + 15 дублей для бесшовного лупа) -->
+          <div class="marquee-track" role="list" aria-label="Логотипы партнёров">
+
+            <!-- ── Оригинальный набор (1–15) ── -->
+            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/1.png"  alt="Partner 1"  class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/2.png"  alt="Partner 2"  class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/3.png"  alt="Partner 3"  class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/4.png"  alt="Partner 4"  class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/5.png"  alt="Partner 5"  class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/6.png"  alt="Partner 6"  class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/7.png"  alt="Partner 7"  class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/8.png"  alt="Partner 8"  class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/9.png"  alt="Partner 9"  class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/10.png" alt="Partner 10" class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/11.png" alt="Partner 11" class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/12.png" alt="Partner 12" class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/13.png" alt="Partner 13" class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/14.png" alt="Partner 14" class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/15.png" alt="Partner 15" class="w-full h-full object-contain" draggable="false"/></div></div>
+
+            <!-- ── Дублированный набор (1–15) — нужен для бесшовного лупа ── -->
+            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/1.png"  alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/2.png"  alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/3.png"  alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/4.png"  alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/5.png"  alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/6.png"  alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/7.png"  alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/8.png"  alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/9.png"  alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/10.png" alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/11.png" alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/12.png" alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/13.png" alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/14.png" alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
+            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/15.png" alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
+
+          </div><!-- /marquee-track -->
+        </div><!-- /marquee-wrapper -->
+
+      </section>
+      <!-- ═══ / СЕКЦИЯ ПАРТНЁРОВ ═══ -->
+
     </div>
 
     <script src="script.js"></script>
