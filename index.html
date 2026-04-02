@@ -3,220 +3,184 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HVAC Quote Calculator</title>
-    <meta name="description" content="Get an instant HVAC replacement quote in under 60 seconds. Answer a few quick questions and we'll send your personalized estimate right away." />
+    <title>Big City HVAC Quote Calculator</title>
+    <meta name="description" content="Get an instant HVAC replacement quote in under 60 seconds." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              accent: {
-                50:  "#eff5ff",
-                100: "#dbe8ff",
-                200: "#bfd5ff",
-                300: "#8cb5ff",
-                500: "#1f6fff",
-                600: "#1658d5",
-                700: "#1448ad",
+              brand: {
+                blue: "#0e2a47",   // Тот самый суровый синий
+                light: "#1a497d",  // Синий посветлее для ховера
+                red: "#e31837",    // Агрессивный красный для кнопок
+                redHover: "#c1122b",
+                gray: "#f4f6f9",   // Технический серый фон
               },
             },
-            boxShadow: {
-              card: "0 28px 60px -30px rgba(17, 53, 125, 0.42)",
-              soft: "0 16px 32px -22px rgba(17, 53, 125, 0.55)",
-            },
             fontFamily: {
-              sans:    ["Manrope", "sans-serif"],
-              display: ["Sora", "Manrope", "sans-serif"],
+              sans:    ["Inter", "sans-serif"],
+              display: ["Montserrat", "sans-serif"],
             },
           },
         },
       };
     </script>
     <style>
-      /* ─── slide transitions ─── */
-      @keyframes slideInRight {
-        from { opacity: 0; transform: translateX(48px); }
-        to   { opacity: 1; transform: translateX(0);    }
-      }
-      @keyframes slideInLeft {
-        from { opacity: 0; transform: translateX(-48px); }
-        to   { opacity: 1; transform: translateX(0);     }
-      }
-      @keyframes fadeUp {
-        from { opacity: 0; transform: translateY(16px); }
-        to   { opacity: 1; transform: translateY(0);    }
-      }
-      @keyframes scaleIn {
-        from { opacity: 0; transform: scale(0.94); }
-        to   { opacity: 1; transform: scale(1);    }
-      }
+      /* ─── Анимации ─── */
+      @keyframes slideInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+      @keyframes slideInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+      @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes scaleIn { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
 
-      .anim-slide-right { animation: slideInRight 0.38s cubic-bezier(.22,.68,0,1.2) both; }
-      .anim-slide-left  { animation: slideInLeft  0.38s cubic-bezier(.22,.68,0,1.2) both; }
-      .anim-fade-up     { animation: fadeUp       0.35s ease both; }
-      .anim-scale-in    { animation: scaleIn      0.4s  cubic-bezier(.22,.68,0,1.2) both; }
+      .anim-slide-right { animation: slideInRight 0.3s ease-out both; }
+      .anim-slide-left  { animation: slideInLeft  0.3s ease-out both; }
+      .anim-fade-up     { animation: fadeUp       0.3s ease-out both; }
+      .anim-scale-in    { animation: scaleIn      0.3s ease-out both; }
 
-      /* stagger children */
       .anim-child > *:nth-child(1)  { animation-delay: 0ms;   }
-      .anim-child > *:nth-child(2)  { animation-delay: 60ms;  }
-      .anim-child > *:nth-child(3)  { animation-delay: 120ms; }
-      .anim-child > *:nth-child(4)  { animation-delay: 180ms; }
-      .anim-child > *:nth-child(5)  { animation-delay: 240ms; }
-      .anim-child > *:nth-child(6)  { animation-delay: 300ms; }
+      .anim-child > *:nth-child(2)  { animation-delay: 50ms;  }
+      .anim-child > *:nth-child(3)  { animation-delay: 100ms; }
+      .anim-child > *:nth-child(4)  { animation-delay: 150ms; }
+      .anim-child > *:nth-child(5)  { animation-delay: 200ms; }
+      .anim-child > *:nth-child(6)  { animation-delay: 250ms; }
 
-      /* ── Option card — minimal, no badges ── */
+      /* ─── Жесткие индустриальные карточки ─── */
       .option-card {
         display: flex;
         align-items: center;
         justify-content: space-between;
         width: 100%;
-        padding: 1.15rem 1.5rem;
-        border-radius: .875rem;
-        border: 1.5px solid #e8edf5;
+        padding: 1.25rem 1.5rem;
+        border-radius: 0.375rem; /* Квадратные углы */
+        border: 2px solid #cbd5e1;
         background: #fff;
         cursor: pointer;
-        transition: border-color .15s, transform .12s, background .15s;
+        transition: all .15s ease-in-out;
         text-align: left;
-        font-family: inherit;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
       }
       .option-card:hover {
-        border-color: #93c5fd;
-        background: #f8fbff;
-        transform: translateY(-1px);
+        border-color: #1a497d;
+        background: #f8fafc;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
       }
       .option-card.selected {
-        border-color: #1f6fff;
-        background: #eff5ff;
+        border-color: #0e2a47;
+        background: #eef2f6;
       }
       .option-card .label {
-        font-size: 1.0625rem;
-        font-weight: 600;
-        color: #1e293b;
-        line-height: 1.4;
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #0e2a47;
       }
-      /* checkmark icon inside selected card */
       .option-card .check-icon {
         flex-shrink: 0;
-        color: #1f6fff;
+        color: #e31837; /* Красная галочка вместо синей */
       }
 
-      /* ── Typeform-style input ── */
+      /* ─── Инпуты ─── */
       .tf-input {
         width: 100%;
-        border: 0;
-        border-bottom: 2px solid #e2e8f0;
-        background: transparent;
-        padding: 1rem 0;
-        font-size: 1.5rem;
-        font-weight: 500;
-        color: #1e293b;
+        border: 2px solid #cbd5e1;
+        border-radius: 0.375rem;
+        background: #fff;
+        padding: 1rem 1.25rem;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #0e2a47;
         outline: none;
         transition: border-color .2s;
-        font-family: inherit;
-        caret-color: #1f6fff;
       }
-      .tf-input::placeholder { color: #94a3b8; font-weight: 400; font-size: 1.3rem; }
-      .tf-input:focus { border-color: #1f6fff; }
+      .tf-input::placeholder { color: #94a3b8; font-weight: 500; font-size: 1.15rem; }
+      .tf-input:focus { border-color: #0e2a47; box-shadow: 0 0 0 3px rgba(14,42,71,0.1); }
 
-      /* progress bar */
-      #progressFill {
-        transition: width .5s cubic-bezier(.22,.68,0,1.2);
-      }
+      #progressFill { transition: width .4s ease; }
 
-      /* ── result meta label ── */
+      /* ─── Стили результатов ─── */
       .result-label {
         display: block;
-        font-size: .72rem;
-        font-weight: 700;
-        letter-spacing: .08em;
+        font-size: .75rem;
+        font-weight: 800;
+        letter-spacing: .05em;
         text-transform: uppercase;
-        color: #94a3b8;
-        margin-bottom: .2rem;
+        color: #64748b;
+        margin-bottom: .25rem;
       }
       .result-value {
-        font-size: .9375rem;
-        font-weight: 600;
-        color: #334155;
+        font-size: 1.125rem;
+        font-weight: 800;
+        color: #0e2a47;
       }
-      /* inline OK button */
+
+      /* ─── Главная кнопка OK ─── */
       .step-next-btn {
         display: inline-flex;
         align-items: center;
         gap: .5rem;
-        background: #1f6fff;
+        background: #e31837;
         color: #fff;
         border: none;
-        border-radius: .75rem;
-        padding: .85rem 2.5rem;
-        font-size: .9375rem;
-        font-weight: 700;
+        border-radius: 0.375rem;
+        padding: 0.875rem 3rem;
+        font-size: 1rem;
+        font-weight: 800;
+        text-transform: uppercase;
         cursor: pointer;
-        font-family: inherit;
-        transition: background .15s, transform .12s, opacity .15s;
+        transition: all .15s;
+        box-shadow: 0 4px 10px rgba(227, 24, 55, 0.3);
       }
-      .step-next-btn:hover:not(:disabled) { background: #1658d5; transform: translateY(-1px); }
-      .step-next-btn:disabled { opacity: .3; cursor: not-allowed; transform: none; }
-      .step-next-btn:focus-visible { outline: 3px solid #8cb5ff; outline-offset: 3px; }
+      .step-next-btn:hover:not(:disabled) { background: #c1122b; transform: translateY(-1px); box-shadow: 0 6px 14px rgba(227, 24, 55, 0.4); }
+      .step-next-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+      .step-next-btn:focus-visible { outline: 3px solid #fca5a5; outline-offset: 3px; }
 
-      /* pulse dot */
       @keyframes pulse-ring {
-        0%   { transform: scale(.9); box-shadow: 0 0 0 0 rgba(31,111,255,.5); }
-        70%  { transform: scale(1);  box-shadow: 0 0 0 10px rgba(31,111,255,0); }
-        100% { transform: scale(.9); box-shadow: 0 0 0 0 rgba(31,111,255,0); }
+        0%   { transform: scale(.85); box-shadow: 0 0 0 0 rgba(227,24,55,.6); }
+        70%  { transform: scale(1);  box-shadow: 0 0 0 10px rgba(227,24,55,0); }
+        100% { transform: scale(.85); box-shadow: 0 0 0 0 rgba(227,24,55,0); }
       }
       .pulse-dot { animation: pulse-ring 2s infinite; }
-
-      /* hide scrollbar on step containers */
+      
       .step-content { -ms-overflow-style: none; scrollbar-width: none; }
       .step-content::-webkit-scrollbar { display: none; }
     </style>
   </head>
-  <body class="relative min-h-screen overflow-x-hidden bg-white text-slate-900 antialiased font-sans">
+  <body class="relative min-h-screen overflow-x-hidden bg-brand-gray text-slate-900 antialiased font-sans">
 
-    <!-- decorative blobs (very subtle on white) -->
-    <div class="pointer-events-none fixed -left-40 top-[-80px] h-96 w-96 rounded-full bg-accent-100/30 blur-3xl"></div>
-    <div class="pointer-events-none fixed -right-32 bottom-0 h-80 w-80 rounded-full bg-cyan-50/50 blur-3xl"></div>
-
-    <!-- ═══════════════════════════════════════
-         WRAPPER — full viewport height per step
-    ═══════════════════════════════════════ -->
     <div class="flex min-h-screen flex-col">
 
-      <!-- TOP BAR -->
-      <header class="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-white/60 bg-white/80 px-5 py-3.5 backdrop-blur sm:px-8">
-        <img src="logo.svg" alt="Big City logo" class="h-auto w-32 sm:w-40" />
+  <header class="sticky top-0 z-20 flex items-center justify-between gap-4 border-b-4 border-brand-red bg-brand-blue px-5 py-3 shadow-md sm:px-8">
+  <div class="flex items-center">
+    <img src="logo.svg" alt="Big City Logo" class="h-16 sm:h-20 w-auto object-contain" />
+  </div>
 
-        <div class="flex items-center gap-3">
-          <span id="stepLabel" class="text-xs font-semibold text-slate-400"></span>
-          <span id="stepIndicator" class="rounded-full border border-slate-200 bg-white px-3 py-1 text-sm font-bold text-slate-700">1/6</span>
-        </div>
-      </header>
+  <div class="flex items-center gap-3">
+    <span id="stepLabel" class="hidden sm:inline-block text-xs font-bold uppercase tracking-wider text-slate-300"></span>
+    <span id="stepIndicator" class="rounded border border-slate-600 bg-slate-800 px-3 py-1 text-sm font-bold text-white">1/6</span>
+  </div>
+</header>
 
-      <!-- PROGRESS BAR (thin accent line) -->
-      <div class="h-1 w-full bg-slate-100">
-        <div id="progressFill" class="h-full rounded-r-full bg-gradient-to-r from-accent-500 to-accent-300" style="width:0%"></div>
+      <div class="h-1.5 w-full bg-slate-200">
+        <div id="progressFill" class="h-full bg-brand-red" style="width:0%"></div>
       </div>
 
-      <!-- ─── STEP CONTAINER ─── -->
       <main id="stepContainer" class="flex flex-1 flex-col items-center justify-center px-5 py-12 sm:px-8">
-        <!-- steps are injected here by JS -->
-      </main>
+        </main>
 
-      <!-- BOTTOM NAV — back only; OK button lives inside each step -->
-      <footer class="flex items-center justify-between gap-4 border-t border-slate-100 bg-white px-5 py-3.5 sm:px-8">
+      <footer class="flex items-center justify-between gap-4 border-t-2 border-slate-200 bg-white px-5 py-4 sm:px-8">
         <button
           id="backButton"
           type="button"
-          class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500 transition duration-150 hover:border-slate-300 hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-30"
+          class="inline-flex items-center gap-1.5 rounded bg-slate-100 px-4 py-2.5 text-sm font-bold text-slate-600 transition duration-150 hover:bg-slate-200 hover:text-brand-blue disabled:cursor-not-allowed disabled:opacity-40 uppercase"
         >
           ← Back
         </button>
 
-        <!-- nextButton kept in DOM for JS ref but hidden visually -->
         <button id="nextButton" type="button" class="hidden" disabled>OK</button>
       </footer>
     </div>
