@@ -133,18 +133,19 @@ function renderStepControls(stepIndex, disabled = true) {
 
 // ─── Option card HTML ─────────────────────
 // layout: 'vertical' (квадратная сетка) | 'horizontal' (полноширинная строка)
-function optionCard(label, stateKey, layout = 'horizontal') {
+function optionCard(label, stateKey, layout = 'horizontal', imageSrc = null) {
   const selected = answers[stateKey] === label;
   return `
     <button
       type="button"
       role="radio"
       aria-checked="${selected}"
-      class="option-card ${layout} ${selected ? 'selected' : ''} anim-fade-up"
+      class="option-card ${layout} ${selected ? 'selected' : ''} anim-fade-up group"
       data-key="${stateKey}"
       data-value="${label}"
       data-layout="${layout}"
     >
+      ${imageSrc ? `<img src="${imageSrc}" alt="${label}" class="w-24 h-24 sm:w-28 sm:h-28 object-contain mb-4 drop-shadow-sm transition-transform group-hover:scale-105" loading="lazy" draggable="false">` : ''}
       <span class="label">${label}</span>
       ${selected
         ? `<svg class="check-icon" fill="currentColor" viewBox="0 0 20 20">
@@ -158,7 +159,12 @@ function optionCard(label, stateKey, layout = 'horizontal') {
 // ─── STEPS TEMPLATES ───────────────────────────────
 
 function renderStep0() {
-  const opts = ["Single-Family", "Condo", "Mobile", "Townhouse"];
+  const opts = [
+    { label: "Single-Family", img: "homes/single.png" },
+    { label: "Condo",         img: "homes/condo.png" },
+    { label: "Mobile",        img: "homes/mobile.png" },
+    { label: "Townhouse",     img: "homes/townhouse.png" },
+  ];
   return `
     <div class="w-full max-w-2xl mx-auto">
       <div class="text-center mb-10 anim-fade-up">
@@ -170,14 +176,20 @@ function renderStep0() {
         </p>
       </div>
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 anim-child" role="radiogroup">
-        ${opts.map(opt => optionCard(opt, "homeType", "vertical")).join("")}
+        ${opts.map(opt => optionCard(opt.label, "homeType", "vertical", opt.img)).join("")}
       </div>
       ${renderStepControls(0, !isStepValid(0))}
     </div>`;
 }
 
 function renderStep1() {
-  const opts = ["Furnace", "A/C", "Mini-Split", "Heat Pump", "A/C & Furnace"];
+  const opts = [
+    { label: "Furnace",      img: "systems/furnace.png" },
+    { label: "A/C",          img: "systems/ac.png" },
+    { label: "Mini-Split",   img: "systems/minisplit.png" },
+    { label: "Heat Pump",    img: "systems/heatpump.png" },
+    { label: "A/C & Furnace", img: "systems/combo.png" },
+  ];
   return `
     <div class="w-full max-w-2xl mx-auto">
       <div class="text-center mb-10 anim-fade-up">
@@ -186,7 +198,7 @@ function renderStep1() {
         </h1>
       </div>
       <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 anim-child" role="radiogroup">
-        ${opts.map(opt => optionCard(opt, "systemType", "vertical")).join("")}
+        ${opts.map(opt => optionCard(opt.label, "systemType", "vertical", opt.img)).join("")}
       </div>
       ${renderStepControls(1, !isStepValid(1))}
     </div>`;
@@ -209,7 +221,10 @@ function renderStep2() {
 }
 
 function renderStep3() {
-  const opts = ["New Installation", "Replacement"];
+  const opts = [
+    { label: "New Installation", img: "install/new.png" },
+    { label: "Replacement",      img: "install/replace.png" },
+  ];
   return `
     <div class="w-full max-w-2xl mx-auto">
       <div class="text-center mb-10 anim-fade-up">
@@ -218,7 +233,7 @@ function renderStep3() {
         </h1>
       </div>
       <div class="grid grid-cols-2 gap-4 max-w-md mx-auto anim-child" role="radiogroup">
-        ${opts.map(opt => optionCard(opt, "replaceNew", "vertical")).join("")}
+        ${opts.map(opt => optionCard(opt.label, "replaceNew", "vertical", opt.img)).join("")}
       </div>
       ${renderStepControls(3, !isStepValid(3))}
     </div>`;
