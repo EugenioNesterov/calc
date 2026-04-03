@@ -40,6 +40,20 @@ const progressFill  = document.getElementById("progressFill");
 const stepIndicator = document.getElementById("stepIndicator");
 const stepLabel     = document.getElementById("stepLabel");
 
+// ─── Phone Formatter ────────────────────────────────
+/**
+ * Форматирует строку в маску US-телефона.
+ * < 4 цифр  → «XXX»
+ * < 7 цифр  → «(XXX) XXX»
+ * иначе     → «(XXX) XXX-XXXX» (макс. 10 цифр)
+ */
+function formatUSPhone(value) {
+  const digits = value.replace(/\D/g, "").slice(0, 10);
+  if (digits.length < 4) return digits;
+  if (digits.length < 7) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+}
+
 // ─── Validation ──────────────────────────
 function isStepValid(stepIndex) {
   switch (stepIndex) {
@@ -50,7 +64,11 @@ function isStepValid(stepIndex) {
     case 4: return answers.sqFootage  !== null;
     case 5: return answers.zipCode.trim().length >= 5;
     case 6: return answers.firstName.trim().length > 0 && answers.lastName.trim().length > 0;
-    case 7: return answers.phone.trim().length >= 10 && answers.email.trim().includes("@");
+    case 7: {
+      const phoneDigits = answers.phone.replace(/\D/g, "");
+      const emailRegex  = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return phoneDigits.length === 10 && emailRegex.test(answers.email.trim());
+    }
     case 8: return true;
     default: return false;
   }
@@ -468,79 +486,7 @@ function getSystemSize() {
   return sizes[answers.sqFootage] || "3 Ton";
 }
 
-function renderStep8() {
-  const price = calculatePrice();
-  const systemSize = getSystemSize();
-  const systemType = answers.systemType || "HVAC System";
-  const firstName = answers.firstName || "";
 
-  return `
-    <div class="w-full max-w-xl mx-auto">
-      <div class="flex justify-center mb-8 anim-scale-in">
-        <div class="flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-4 py-1.5">
-          <span class="pulse-dot w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
-          <span class="text-xs font-bold text-emerald-700 tracking-wide uppercase">
-            ${firstName ? `Quote ready · ${firstName}` : "Quote ready"}
-          </span>
-        </div>
-      </div>
-      <div class="flex flex-wrap gap-x-8 gap-y-4 mb-6 anim-fade-up" style="animation-delay:40ms">
-        <div>
-          <span class="result-label">Estimate Type</span>
-          <span class="result-value">${systemType}</span>
-        </div>
-        <div>
-          <span class="result-label">System Size</span>
-          <span class="result-value">${systemSize}</span>
-        </div>
-      </div>
-      <div class="mb-8 anim-fade-up" style="animation-delay:80ms">
-        <p class="font-display text-6xl sm:text-7xl font-extrabold tracking-tight text-slate-900 leading-none">
-          ${price}
-        </p>
-        <p class="mt-2 text-sm text-slate-400">Estimated installed price · Confirmed after in-home assessment</p>
-      </div>
-      <div class="h-px bg-slate-100 mb-7"></div>
-      <div class="mb-7 anim-fade-up" style="animation-delay:120ms">
-        <span class="result-label">Brand</span>
-        <p class="text-[.9375rem] font-semibold text-slate-800 mt-0.5">
-          AC PRO <span class="font-normal text-slate-400">(Lennox also available)</span>
-        </p>
-      </div>
-      <div class="h-px bg-slate-100 mb-7"></div>
-      <div class="mb-7 anim-fade-up" style="animation-delay:150ms">
-        <span class="result-label">Special Offers</span>
-        <ul class="mt-2 space-y-2">
-          <li class="text-[.9375rem] text-slate-700">• Senior, Military &amp; First Responder Discounts</li>
-          <li class="text-[.9375rem] text-slate-700">• Up to $2,000 in Tax Credits Available on Select Systems</li>
-        </ul>
-      </div>
-      <div class="mb-7 rounded-xl bg-amber-50 border border-amber-100 px-4 py-4 anim-fade-up" style="animation-delay:180ms">
-        <p class="text-xs font-bold uppercase tracking-widest text-amber-500 mb-1">Additional Savings</p>
-        <p class="text-sm text-amber-900 leading-relaxed">Book your in-home consultation today and unlock an exclusive early booking discount!</p>
-      </div>
-      <p class="text-sm text-slate-500 leading-relaxed mb-8 anim-fade-up" style="animation-delay:200ms">
-        Schedule a FREE in-home consultation with our team to assess your home, answer your questions, and explore financing options. It's all at no cost to you!
-      </p>
-      <div class="grid gap-3 sm:grid-cols-2 anim-fade-up" style="animation-delay:220ms">
-        <a href="tel:6196262499" id="callNowBtn" class="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-bold text-slate-700 transition duration-150 hover:border-accent-300 hover:text-accent-600 focus:outline-none focus:ring-4 focus:ring-accent-100">
-          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
-          </svg>
-          Call Now: 619-626-2499
-        </a>
-        <button type="button" id="bookNowBtn" class="flex items-center justify-center gap-2 rounded-xl bg-accent-500 px-5 py-3.5 text-sm font-bold text-white transition duration-150 hover:bg-accent-600 focus:outline-none focus:ring-4 focus:ring-accent-100">
-          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
-          </svg>
-          BOOK NOW
-        </button>
-      </div>
-      <p class="mt-6 text-xs text-slate-400 text-center leading-relaxed border-t border-slate-100 pt-5 anim-fade-up" style="animation-delay:240ms">
-        This online estimate is subject to adjustment following the in-home assessment. Pricing may vary based on additional features or simpler options. Ductwork is not included, and discounts may vary.
-      </p>
-    </div>`;
-}
 
 // ─── Step Router ─────────────────────────────────────
 const RENDERERS = {
@@ -609,7 +555,17 @@ function attachListeners() {
   const attachInput = (id, key, nextId) => {
     const input = document.getElementById(id);
     if (input) {
-      input.addEventListener("input", () => { answers[key] = input.value; refreshStepNext(); });
+      input.addEventListener("input", () => {
+        let val = input.value;
+        if (id === "phoneInput") {
+          val = formatUSPhone(val);
+        } else if (id === "emailInput") {
+          val = val.replace(/\s/g, "").toLowerCase();
+        }
+        input.value  = val;
+        answers[key] = val;
+        refreshStepNext();
+      });
       input.addEventListener("keydown", e => { 
         if (e.key === "Enter") {
           if (nextId) document.getElementById(nextId)?.focus();
