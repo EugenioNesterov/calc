@@ -375,15 +375,6 @@ function renderStep8() {
       
       <div class="h-1 w-full bg-slate-200 mb-7"></div>
       
-      <div class="mb-7 anim-fade-up" style="animation-delay:120ms">
-        <span class="result-label">Brand</span>
-        <p class="text-lg font-black text-brand-blue mt-0.5 uppercase tracking-wide">
-          Big City Pro <span class="font-semibold text-slate-400 text-sm tracking-normal">(Lennox also available)</span>
-        </p>
-      </div>
-      
-      <div class="h-1 w-full bg-slate-200 mb-7"></div>
-      
       <div class="mb-7 anim-fade-up" style="animation-delay:150ms">
         <span class="result-label">Special Offers</span>
         <ul class="mt-3 space-y-3">
