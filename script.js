@@ -14,6 +14,7 @@ const answers = {
   lastName:   "",
   phone:      "",
   email:      "",
+  privacyAgreed: false,
 };
 
 // Instead of a linear currentStep, we track our position in a dynamic path
@@ -54,6 +55,25 @@ function formatUSPhone(value) {
   return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
 }
 
+// ─── Reset Logic ────────────────────────────────────
+function resetCalculator() {
+  // Очистка объекта ответов к исходному состоянию
+  answers.homeType   = null;
+  answers.systemType = null;
+  answers.zones      = null;
+  answers.replaceNew = null;
+  answers.sqFootage  = null;
+  answers.zipCode    = "";
+  answers.firstName  = "";
+  answers.lastName   = "";
+  answers.phone      = "";
+  answers.email      = "";
+  answers.privacyAgreed = false;
+
+  pathIndex = 0;
+  renderStep(1);
+}
+
 // ─── Validation ──────────────────────────
 function isStepValid(stepIndex) {
   switch (stepIndex) {
@@ -67,7 +87,7 @@ function isStepValid(stepIndex) {
     case 7: {
       const phoneDigits = answers.phone.replace(/\D/g, "");
       const emailRegex  = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return phoneDigits.length === 10 && emailRegex.test(answers.email.trim());
+      return phoneDigits.length === 10 && emailRegex.test(answers.email.trim()) && !!answers.privacyAgreed;
     }
     case 8: return true;
     default: return false;
@@ -327,10 +347,22 @@ function renderStep7() {
         <div class="anim-fade-up" style="animation-delay:60ms">
           <label for="phoneInput" class="block text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">Phone Number</label>
           <input id="phoneInput" type="tel" inputmode="tel" placeholder="(555) 123-4567" value="${answers.phone}" class="tf-input" autocomplete="tel"/>
+          <p class="text-[10px] text-slate-400 mt-2 font-medium leading-relaxed">By providing your phone number, you consent to receive calls and SMS regarding your quote.</p>
         </div>
         <div class="anim-fade-up" style="animation-delay:130ms">
           <label for="emailInput" class="block text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">Email</label>
           <input id="emailInput" type="email" inputmode="email" placeholder="email@example.com" value="${answers.email}" class="tf-input" autocomplete="email"/>
+          <p class="text-[10px] text-slate-400 mt-2 font-medium leading-relaxed">By providing your email, you consent to receive quote details and updates.</p>
+        </div>
+        
+        <div class="anim-fade-up" style="animation-delay:200ms">
+          <label class="relative inline-flex items-center cursor-pointer group">
+            <input type="checkbox" id="privacyCheckbox" class="sr-only peer" ${answers.privacyAgreed ? 'checked' : ''}>
+            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-red"></div>
+            <span class="ml-3 text-sm font-bold text-slate-600">
+              I agree to the <button type="button" id="openPrivacyModalBtn" class="text-brand-blue underline hover:text-brand-light transition-colors">Privacy Policy</button>
+            </span>
+          </label>
         </div>
       </div>
       ${renderStepControls(7, !isStepValid(7))}
@@ -406,8 +438,14 @@ function renderStep8() {
           BOOK NOW
         </button>
       </div>
+
+      <div class="mt-6 text-center anim-fade-up" style="animation-delay:260ms">
+        <span id="startOverBtn" class="text-sm font-semibold text-slate-400 hover:text-slate-600 mt-6 cursor-pointer underline underline-offset-4">
+          Start Over
+        </span>
+      </div>
       
-      <p class="mt-8 text-[11px] font-semibold text-slate-400 text-center leading-relaxed border-t border-slate-200 pt-6 anim-fade-up" style="animation-delay:240ms">
+      <p class="mt-8 text-[11px] font-semibold text-slate-400 text-center leading-relaxed border-t border-slate-200 pt-6 anim-fade-up" style="animation-delay:280ms">
         This online estimate is subject to adjustment following the in-home assessment. Pricing may vary based on additional features or simpler options. Ductwork is not included, and discounts may vary.
       </p>
     </div>`;
@@ -509,9 +547,35 @@ function renderStep(dir = 1) {
 
 // ─── Event Listeners ─────────────────────────────────
 function attachListeners() {
+  // Глобальный слушатель для логотипа (сброс)
+  const logoBtn = document.getElementById("logoResetBtn");
+  if (logoBtn) {
+    logoBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      resetCalculator();
+    });
+  }
+
+  // ─── Модальное окно Privacy Policy ──────────────────
+  const privacyModal = document.getElementById("privacyModal");
+  const openPrivacyBtn = document.getElementById("openPrivacyModalBtn");
+  const closePrivacyBtn = document.getElementById("closePrivacyModalBtn");
+  const privacyOverlay = document.getElementById("privacyOverlay");
+
+  const toggleModal = (show) => {
+    if (privacyModal) privacyModal.classList.toggle("hidden", !show);
+    document.body.style.overflow = show ? "hidden" : "";
+  };
+
+  if (openPrivacyBtn) openPrivacyBtn.addEventListener("click", () => toggleModal(true));
+  if (closePrivacyBtn) closePrivacyBtn.addEventListener("click", () => toggleModal(false));
+  if (privacyOverlay) privacyOverlay.addEventListener("click", () => toggleModal(false));
+
   // Динамические кнопки навигации внутри шага
   document.querySelector(".step-next-btn")?.addEventListener("click", tryAdvance);
   document.querySelector(".step-back-btn")?.addEventListener("click", () => advance(-1));
+  
+  // ... (existing option-card and input listeners) ...
 
   document.querySelectorAll(".option-card").forEach(card => {
     card.addEventListener("click", () => {
@@ -546,18 +610,37 @@ function attachListeners() {
   const attachInput = (id, key, nextId) => {
     const input = document.getElementById(id);
     if (input) {
-      input.addEventListener("input", () => {
-        let val = input.value;
-        if (id === "phoneInput") {
-          val = formatUSPhone(val);
-        } else if (id === "emailInput") {
+      input.addEventListener("input", (e) => {
+        let val = e.target.value;
+
+        // Применяем правила валидации и маскирования в реальном времени
+        if (key === "zipCode") {
+          // Только цифры, макс. 5 символов
+          val = val.replace(/\D/g, "").slice(0, 5);
+        } else if (key === "firstName" || key === "lastName") {
+          // Только буквы, пробелы и дефисы
+          val = val.replace(/[^a-zA-Z\s-]/g, "");
+        } else if (key === "phone") {
+          // Маска телефона (XXX) XXX-XXXX
+          const digits = val.replace(/\D/g, "").slice(0, 10);
+          if (digits.length <= 3) {
+            val = digits;
+          } else if (digits.length <= 6) {
+            val = `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+          } else {
+            val = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+          }
+        } else if (key === "email") {
+          // Удаление всех пробелов и перевод в нижний регистр
           val = val.replace(/\s/g, "").toLowerCase();
         }
-        input.value  = val;
+
+        input.value = val;
         answers[key] = val;
         refreshStepNext();
       });
-      input.addEventListener("keydown", e => { 
+
+      input.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           if (nextId) document.getElementById(nextId)?.focus();
           else tryAdvance();
@@ -572,17 +655,52 @@ function attachListeners() {
   attachInput("phoneInput", "phone", "emailInput");
   attachInput("emailInput", "email");
 
-  const autoFocusField = document.getElementById("zipInput") || document.getElementById("firstNameInput") || document.getElementById("phoneInput");
-  if (autoFocusField) setTimeout(() => autoFocusField.focus(), 200);
+  const currentPath = getActivePath();
+  const stepIndex = currentPath[pathIndex];
 
-  const bookBtn = document.getElementById("bookNowBtn");
-  if (bookBtn) {
-    bookBtn.addEventListener("click", () => {
-      bookBtn.innerHTML = "✓ Booked! We'll be in touch.";
-      bookBtn.disabled  = true;
-      bookBtn.classList.add("opacity-70");
-    });
+  if (stepIndex === 7) {
+    const privacyCheckbox = document.getElementById("privacyCheckbox");
+    if (privacyCheckbox) {
+      privacyCheckbox.addEventListener("change", (e) => {
+        answers.privacyAgreed = e.target.checked;
+        refreshStepNext();
+      });
+    }
   }
+
+  // Логика для финального шага (Step 8)
+  if (stepIndex === 8) {
+    document.getElementById("startOverBtn")?.addEventListener("click", resetCalculator);
+    
+    const bookBtn = document.getElementById("bookNowBtn");
+    if (bookBtn) {
+      bookBtn.addEventListener("click", () => {
+        const stepContainer = document.getElementById("stepContainer");
+        if (stepContainer) {
+          stepContainer.innerHTML = `
+            <div class="flex flex-col items-center justify-center p-8 anim-fade-up">
+              <svg class="w-20 h-20 text-green-500 mb-6 anim-scale-in" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <h2 class="text-xl sm:text-2xl font-bold text-slate-800 text-center mb-6">
+                Our specialist will contact you within 2 minutes to help you choose the right solution.
+              </h2>
+              <p class="text-base italic text-slate-600 text-center mb-4 max-w-lg mx-auto">
+                "The mission of our company is to provide the most comfortable solution at a fair price — and ensure every customer is fully satisfied."
+              </p>
+              <p class="text-base font-bold text-slate-800 text-center">
+                — Val Malinovskii
+              </p>
+            </div>
+          `;
+          // Прокрутка наверх при замене контента
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      });
+    }
+  }
+
+  const autoFocusField = document.getElementById("zipInput") || document.getElementById("firstNameInput") || document.getElementById("phoneInput");
 }
 
 // ─── Navigation ──────────────────────────────────────

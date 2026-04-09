@@ -218,8 +218,13 @@
     <div class="flex min-h-screen flex-col">
 
       <header class="sticky top-0 z-20 flex items-center justify-between gap-4 bg-white px-5 py-3 shadow-sm sm:px-8">
-        <div class="flex items-center">
-          <img src="logo.svg" alt="Big City Logo" class="h-16 sm:h-20 w-auto object-contain" />
+        <div class="flex items-center gap-4">
+          <a href="#" id="logoResetBtn">
+            <img src="logo.svg" alt="Big City Logo" class="h-16 sm:h-20 w-auto object-contain" />
+          </a>
+          <p class="hidden md:block text-base sm:text-lg font-extrabold text-slate-700 border-l-2 border-slate-200 pl-4">
+            Top Quality Service at Fair Prices — Trusted in San Diego for 10+ Years
+          </p>
         </div>
 
         <div class="flex items-center gap-3">
@@ -292,6 +297,98 @@
       </section>
       <!-- ═══ / СЕКЦИЯ ПАРТНЁРОВ ═══ -->
 
+    </div>
+
+    <!-- ═══ Privacy Policy Modal ═══ -->
+    <div id="privacyModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+      <!-- Overlay -->
+      <div class="absolute inset-0 bg-black/50" id="privacyOverlay"></div>
+      
+      <!-- Content -->
+      <div class="bg-white rounded-2xl max-w-2xl max-h-[80vh] overflow-y-auto p-6 relative shadow-2xl anim-scale-in">
+        <button type="button" id="closePrivacyModalBtn" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+
+        <div class="prose prose-slate max-w-none">
+          <h2 class="text-2xl font-black text-brand-blue uppercase tracking-tight mb-2">Privacy Policy</h2>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Big City HVAC & Appliance Repair · Effective Date: 04/06/2026</p>
+
+          <div class="space-y-6 text-sm text-slate-600 leading-relaxed">
+            <section>
+              <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">1. Overview</h3>
+              <p>Big City HVAC & Appliance Repair (“we”, “us”, or “our”) values your privacy. This Privacy Policy explains how we collect and use information through our website and HVAC estimate calculator.</p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">2. Information We Collect</h3>
+              <p>When you use our calculator or request an estimate, we may collect:</p>
+              <ul class="list-disc pl-5 space-y-1">
+                <li>Name, Phone number, Email address</li>
+                <li>Property address</li>
+                <li>Project details (home size, system type, etc.)</li>
+              </ul>
+              <p class="mt-2">We may also automatically collect: IP address, Device/browser info, Basic usage data (analytics).</p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">3. How We Use Information</h3>
+              <p>We use your information strictly to:</p>
+              <ul class="list-disc pl-5 space-y-1">
+                <li>Generate HVAC estimates</li>
+                <li>Contact you about your request</li>
+                <li>Schedule service or consultation</li>
+                <li>Improve our tools and services</li>
+              </ul>
+              <p class="mt-2 text-brand-blue font-bold">We do not sell or share your personal information for marketing to third parties.</p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">4. Data Sharing</h3>
+              <p>We may share data only with: Our internal team, Tools we use to operate the business (CRM, scheduling software). All data is used solely to provide our services.</p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">5. California Privacy Rights</h3>
+              <p>If you are a California resident, you have the right to:</p>
+              <ul class="list-disc pl-5 space-y-1">
+                <li>Request access to your data</li>
+                <li>Request deletion of your data</li>
+                <li>Request correction of your data</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">6. Cookies</h3>
+              <p>We may use cookies to improve website performance and track usage. You can disable cookies in your browser settings.</p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">7. Data Security</h3>
+              <p>We take reasonable steps to protect your information. However, no system is completely secure.</p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">8. Data Retention</h3>
+              <p>We keep your information only as long as needed to: Provide services, Follow legal requirements.</p>
+            </section>
+
+            <section>
+              <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">9. Updates</h3>
+              <p>We may update this policy. Updates will be posted on this page.</p>
+            </section>
+
+            <section class="pt-6 border-t border-slate-100">
+              <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">10. Contact</h3>
+              <p class="font-bold">Big City HVAC & Appliance Repair</p>
+              <p>San Diego, CA</p>
+              <p class="text-brand-red font-black">📞 858-261-4011</p>
+            </section>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script src="script.js"></script>
