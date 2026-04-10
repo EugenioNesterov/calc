@@ -1,396 +1,640 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Big City HVAC Quote Calculator</title>
-    <meta name="description" content="Get an instant HVAC replacement quote in under 60 seconds." />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              brand: {
-                blue: "#0e2a47",   
-                light: "#1a497d",  
-                red: "#ff6b00",    /* Оранжевый цвет для всех акцентов, кнопок и прогресс-бара */
-                redHover: "#e66000",
-                gray: "#f4f6f9",   
-              },
-            },
-            fontFamily: {
-              sans:    ["Inter", "sans-serif"],
-              display: ["Montserrat", "sans-serif"],
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Big City HVAC Quote Calculator</title>
+  <meta name="description" content="Get an instant HVAC replacement quote in under 60 seconds." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800;900&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              blue: "#0e2a47",
+              light: "#1a497d",
+              red: "#ff6b00",    /* Оранжевый цвет для всех акцентов, кнопок и прогресс-бара */
+              redHover: "#e66000",
+              gray: "#f4f6f9",
             },
           },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            display: ["Montserrat", "sans-serif"],
+          },
         },
-      };
-    </script>
-    <style>
-      /* ─── Анимации ─── */
-      @keyframes slideInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
-      @keyframes slideInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
-      @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-      @keyframes scaleIn { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
-
-      .anim-slide-right { animation: slideInRight 0.3s ease-out both; }
-      .anim-slide-left  { animation: slideInLeft  0.3s ease-out both; }
-      .anim-fade-up     { animation: fadeUp       0.3s ease-out both; }
-      .anim-scale-in    { animation: scaleIn      0.3s ease-out both; }
-
-      .anim-child > *:nth-child(1)  { animation-delay: 0ms;   }
-      .anim-child > *:nth-child(2)  { animation-delay: 50ms;  }
-      .anim-child > *:nth-child(3)  { animation-delay: 100ms; }
-      .anim-child > *:nth-child(4)  { animation-delay: 150ms; }
-      .anim-child > *:nth-child(5)  { animation-delay: 200ms; }
-      .anim-child > *:nth-child(6)  { animation-delay: 250ms; }
-
-      /* ─── Базовые стили карточки (общие для всех вариантов) ─── */
-      .option-card {
-        display: flex;
-        border-radius: 0.5rem;
-        border: 2px solid #cbd5e1;
-        background: #fff;
-        cursor: pointer;
-        transition: border-color .15s ease-in-out,
-                    background .15s ease-in-out,
-                    transform .15s ease-in-out,
-                    box-shadow .15s ease-in-out;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-      }
-      .option-card:hover {
-        border-color: #1a497d;
-        background: #f8fafc;
-        transform: translateY(-3px);
-        box-shadow: 0 6px 14px rgba(0,0,0,0.08);
-      }
-      .option-card.selected {
-        border-color: #0e2a47;
-        background: #e8f0f8;
-        box-shadow: 0 0 0 3px rgba(14,42,71,0.12);
+      },
+    };
+  </script>
+  <style>
+    /* ─── Анимации ─── */
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
       }
 
-      /* ─── Вертикальный вариант: квадратные карточки в сетке ─── */
-      .option-card.vertical {
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 0.25rem;
-        min-height: 10rem;
-        padding: 1.5rem 1rem;
-        text-align: center;
+      to {
+        opacity: 1;
+        transform: translateX(0);
       }
-      .option-card.vertical .label {
-        font-size: 0.8125rem;
-        font-weight: 700;
-        color: #0e2a47;
-        line-height: 1.3;
-        word-break: break-word;
-        hyphens: auto;
-      }
-      .option-card.vertical .check-icon {
-        flex-shrink: 0;
-        color: #ff6b00;
-        width: 1.125rem;
-        height: 1.125rem;
-      }
-      .option-card.vertical .check-placeholder {
-        display: none;
+    }
+
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-30px);
       }
 
-      /* ─── Горизонтальный вариант: полноширинные строки ─── */
-      .option-card.horizontal {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        padding: 1.25rem 1.5rem;
-        text-align: left;
+      to {
+        opacity: 1;
+        transform: translateX(0);
       }
-      .option-card.horizontal .label {
-        font-size: 1.125rem;
-        font-weight: 700;
-        color: #0e2a47;
-      }
-      .option-card.horizontal .check-icon {
-        flex-shrink: 0;
-        color: #ff6b00;
-        width: 1.25rem;
-        height: 1.25rem;
-      }
-      .option-card.horizontal .check-placeholder {
-        width: 1.25rem;
-        height: 1.25rem;
-        flex-shrink: 0;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
       }
 
-      /* ─── Инпуты ─── */
-      .tf-input {
-        width: 100%;
-        border: 2px solid #cbd5e1;
-        border-radius: 0.375rem;
-        background: #fff;
-        padding: 1rem 1.25rem;
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #0e2a47;
-        outline: none;
-        transition: border-color .2s;
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
-      .tf-input::placeholder { color: #94a3b8; font-weight: 500; font-size: 1.15rem; }
-      .tf-input:focus { border-color: #0e2a47; box-shadow: 0 0 0 3px rgba(14,42,71,0.1); }
+    }
 
-      #progressFill { transition: width .4s ease; }
-
-      /* ─── Стили результатов ─── */
-      .result-label {
-        display: block;
-        font-size: .75rem;
-        font-weight: 800;
-        letter-spacing: .05em;
-        text-transform: uppercase;
-        color: #64748b;
-        margin-bottom: .25rem;
-      }
-      .result-value {
-        font-size: 1.125rem;
-        font-weight: 800;
-        color: #0e2a47;
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.94);
       }
 
-      /* ─── Главная кнопка OK ─── */
-      .step-next-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: .5rem;
-        background: #ff6b00;
-        color: #fff;
-        border: none;
-        border-radius: 0.375rem;
-        padding: 0.875rem 3rem;
-        font-size: 1rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        cursor: pointer;
-        transition: all .15s;
-        box-shadow: 0 4px 10px rgba(255, 107, 0, 0.3);
+      to {
+        opacity: 1;
+        transform: scale(1);
       }
-      .step-next-btn:hover:not(:disabled) { background: #e66000; transform: translateY(-1px); box-shadow: 0 6px 14px rgba(255, 107, 0, 0.4); }
-      .step-next-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
-      .step-next-btn:focus-visible { outline: 3px solid #fdba74; outline-offset: 3px; }
+    }
 
-      @keyframes pulse-ring {
-        0%   { transform: scale(.85); box-shadow: 0 0 0 0 rgba(255, 107, 0, .6); }
-        70%  { transform: scale(1);  box-shadow: 0 0 0 10px rgba(255, 107, 0, 0); }
-        100% { transform: scale(.85); box-shadow: 0 0 0 0 rgba(255, 107, 0, 0); }
+    .anim-slide-right {
+      animation: slideInRight 0.3s ease-out both;
+    }
+
+    .anim-slide-left {
+      animation: slideInLeft 0.3s ease-out both;
+    }
+
+    .anim-fade-up {
+      animation: fadeUp 0.3s ease-out both;
+    }
+
+    .anim-scale-in {
+      animation: scaleIn 0.3s ease-out both;
+    }
+
+    .anim-child>*:nth-child(1) {
+      animation-delay: 0ms;
+    }
+
+    .anim-child>*:nth-child(2) {
+      animation-delay: 50ms;
+    }
+
+    .anim-child>*:nth-child(3) {
+      animation-delay: 100ms;
+    }
+
+    .anim-child>*:nth-child(4) {
+      animation-delay: 150ms;
+    }
+
+    .anim-child>*:nth-child(5) {
+      animation-delay: 200ms;
+    }
+
+    .anim-child>*:nth-child(6) {
+      animation-delay: 250ms;
+    }
+
+    /* ─── Базовые стили карточки (общие для всех вариантов) ─── */
+    .option-card {
+      display: flex;
+      border-radius: 0.5rem;
+      border: 2px solid #cbd5e1;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .15s ease-in-out,
+        background .15s ease-in-out,
+        transform .15s ease-in-out,
+        box-shadow .15s ease-in-out;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    }
+
+    .option-card:hover {
+      border-color: #1a497d;
+      background: #f8fafc;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    .option-card.selected {
+      border-color: #0e2a47;
+      background: #e8f0f8;
+      box-shadow: 0 0 0 3px rgba(14, 42, 71, 0.12);
+    }
+
+    /* ─── Вертикальный вариант: квадратные карточки в сетке ─── */
+    .option-card.vertical {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.25rem;
+      min-height: 10rem;
+      padding: 1.5rem 1rem;
+      text-align: center;
+    }
+
+    .option-card.vertical .label {
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: #0e2a47;
+      line-height: 1.3;
+      word-break: break-word;
+      hyphens: auto;
+    }
+
+    .option-card.vertical .check-icon {
+      flex-shrink: 0;
+      color: #ff6b00;
+      width: 1.125rem;
+      height: 1.125rem;
+    }
+
+    .option-card.vertical .check-placeholder {
+      display: none;
+    }
+
+    /* ─── Горизонтальный вариант: полноширинные строки ─── */
+    .option-card.horizontal {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 1.25rem 1.5rem;
+      text-align: left;
+    }
+
+    .option-card.horizontal .label {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #0e2a47;
+    }
+
+    .option-card.horizontal .check-icon {
+      flex-shrink: 0;
+      color: #ff6b00;
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
+    .option-card.horizontal .check-placeholder {
+      width: 1.25rem;
+      height: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    /* ─── Инпуты ─── */
+    .tf-input {
+      width: 100%;
+      border: 2px solid #cbd5e1;
+      border-radius: 0.375rem;
+      background: #fff;
+      padding: 1rem 1.25rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #0e2a47;
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    .tf-input::placeholder {
+      color: #94a3b8;
+      font-weight: 500;
+      font-size: 1.15rem;
+    }
+
+    .tf-input:focus {
+      border-color: #0e2a47;
+      box-shadow: 0 0 0 3px rgba(14, 42, 71, 0.1);
+    }
+
+    #progressFill {
+      transition: width .4s ease;
+    }
+
+    /* ─── Стили результатов ─── */
+    .result-label {
+      display: block;
+      font-size: .75rem;
+      font-weight: 800;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: #64748b;
+      margin-bottom: .25rem;
+    }
+
+    .result-value {
+      font-size: 1.125rem;
+      font-weight: 800;
+      color: #0e2a47;
+    }
+
+    /* ─── Главная кнопка OK ─── */
+    .step-next-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      background: #ff6b00;
+      color: #fff;
+      border: none;
+      border-radius: 0.375rem;
+      padding: 0.875rem 3rem;
+      font-size: 1rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all .15s;
+      box-shadow: 0 4px 10px rgba(255, 107, 0, 0.3);
+    }
+
+    .step-next-btn:hover:not(:disabled) {
+      background: #e66000;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(255, 107, 0, 0.4);
+    }
+
+    .step-next-btn:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .step-next-btn:focus-visible {
+      outline: 3px solid #fdba74;
+      outline-offset: 3px;
+    }
+
+    @keyframes pulse-ring {
+      0% {
+        transform: scale(.85);
+        box-shadow: 0 0 0 0 rgba(255, 107, 0, .6);
       }
-      .pulse-dot { animation: pulse-ring 2s infinite; }
-      
-      .step-content { -ms-overflow-style: none; scrollbar-width: none; }
-      .step-content::-webkit-scrollbar { display: none; }
 
-      /* ─── Marquee (бегущая строка партнёров) ─── */
-      @keyframes marquee {
-        from { transform: translateX(0); }
-        to   { transform: translateX(-50%); }
+      70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(255, 107, 0, 0);
       }
 
-      .marquee-track {
-        display: flex;
-        gap: 1.5rem;           /* gap-6 = 24px */
-        width: max-content;    /* растягивается под 30 логотипов */
-        animation: marquee 35s linear infinite;
-        will-change: transform;
+      100% {
+        transform: scale(.85);
+        box-shadow: 0 0 0 0 rgba(255, 107, 0, 0);
+      }
+    }
+
+    .pulse-dot {
+      animation: pulse-ring 2s infinite;
+    }
+
+    .step-content {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .step-content::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* ─── Marquee (бегущая строка партнёров) ─── */
+    @keyframes marquee {
+      from {
+        transform: translateX(0);
       }
 
-      /* Пауза при наведении мыши */
-      .marquee-wrapper:hover .marquee-track {
-        animation-play-state: paused;
+      to {
+        transform: translateX(-50%);
       }
-    </style>
-  </head>
-  <body class="relative min-h-screen overflow-x-hidden bg-brand-gray text-slate-900 antialiased font-sans">
+    }
 
-    <div class="flex min-h-screen flex-col">
+    .marquee-track {
+      display: flex;
+      gap: 1.5rem;
+      /* gap-6 = 24px */
+      width: max-content;
+      /* растягивается под 30 логотипов */
+      animation: marquee 35s linear infinite;
+      will-change: transform;
+    }
 
-      <header class="sticky top-0 z-20 flex items-center justify-between gap-4 bg-white px-5 py-3 shadow-sm sm:px-8">
-        <div class="flex items-center gap-4">
-          <a href="#" id="logoResetBtn">
-            <img src="logo.svg" alt="Big City Logo" class="h-16 sm:h-20 w-auto object-contain" />
-          </a>
-          <p class="hidden md:block text-base sm:text-lg font-extrabold text-slate-700 border-l-2 border-slate-200 pl-4">
-            Top Quality Service at Fair Prices — Trusted in San Diego for 10+ Years
-          </p>
-        </div>
+    /* Пауза при наведении мыши */
+    .marquee-wrapper:hover .marquee-track {
+      animation-play-state: paused;
+    }
+  </style>
+</head>
 
-        <div class="flex items-center gap-3">
-          <span id="stepLabel" class="hidden sm:inline-block text-xs font-bold uppercase tracking-wider text-slate-400"></span>
-          <span id="stepIndicator" class="rounded border border-slate-300 bg-slate-100 px-3 py-1 text-sm font-bold text-brand-blue">1/6</span>
-        </div>
-      </header>
+<body class="relative min-h-screen overflow-x-hidden bg-brand-gray text-slate-900 antialiased font-sans">
 
-      <div class="h-1.5 w-full bg-slate-200">
-        <div id="progressFill" class="h-full bg-brand-red" style="width:0%"></div>
+  <div class="flex min-h-screen flex-col">
+
+    <header class="sticky top-0 z-20 flex items-center justify-between gap-4 bg-white px-5 py-3 shadow-sm sm:px-8">
+      <div class="flex items-center gap-4">
+        <a href="#" id="logoResetBtn">
+          <img src="logo.svg" alt="Big City Logo" class="h-16 sm:h-20 w-auto object-contain" />
+        </a>
+        <p
+          class="hidden md:block text-[18px] lg:text-[22px] xl:text-[26px] whitespace-nowrap font-display font-black uppercase tracking-tight text-[#2868d7]">
+          Top Quality Service at Fair Prices — Trusted in San Diego for 10+ Years
+        </p>
       </div>
 
-      <main id="stepContainer" class="flex flex-1 flex-col items-center justify-center px-5 py-12 sm:px-8">
-        </main>
+      <div class="flex items-center gap-3">
+        <span id="stepLabel"
+          class="hidden sm:inline-block text-xs font-bold uppercase tracking-wider text-slate-400"></span>
+        <span id="stepIndicator"
+          class="rounded border border-slate-300 bg-slate-100 px-3 py-1 text-sm font-bold text-brand-blue">1/6</span>
+      </div>
+    </header>
 
-      <!-- ═══ СЕКЦИЯ ПАРТНЁРОВ ═══ -->
-      <section class="w-full bg-[#2868d7] py-10 overflow-hidden" aria-label="Our Partners">
-
-        <!-- Заголовок -->
-        <div class="flex items-center gap-4 mb-8 px-5 sm:px-8">
-          <span class="block w-1.5 h-14 rounded-full bg-brand-red flex-shrink-0"></span>
-          <h2 class="font-display text-5xl sm:text-6xl font-black uppercase tracking-tight text-white leading-none">
-            Our Partners
-          </h2>
-        </div>
-
-        <!-- Обёртка: overflow-hidden обрезает трек по краям -->
-        <div class="marquee-wrapper overflow-hidden">
-
-          <!-- Трек: 30 логотипов (15 оригинальных + 15 дублей для бесшовного лупа) -->
-          <div class="marquee-track" role="list" aria-label="Логотипы партнёров">
-
-            <!-- ── Оригинальный набор (1–15) ── -->
-            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/1.png"  alt="Partner 1"  class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/2.png"  alt="Partner 2"  class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/3.png"  alt="Partner 3"  class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/4.png"  alt="Partner 4"  class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/5.png"  alt="Partner 5"  class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/6.png"  alt="Partner 6"  class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/7.png"  alt="Partner 7"  class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/8.png"  alt="Partner 8"  class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/9.png"  alt="Partner 9"  class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/10.png" alt="Partner 10" class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/11.png" alt="Partner 11" class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/12.png" alt="Partner 12" class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/13.png" alt="Partner 13" class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/14.png" alt="Partner 14" class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/15.png" alt="Partner 15" class="w-full h-full object-contain" draggable="false"/></div></div>
-
-            <!-- ── Дублированный набор (1–15) — нужен для бесшовного лупа ── -->
-            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/1.png"  alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/2.png"  alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/3.png"  alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/4.png"  alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/5.png"  alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/6.png"  alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/7.png"  alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/8.png"  alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/9.png"  alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/10.png" alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/11.png" alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/12.png" alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/13.png" alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/14.png" alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
-            <div role="listitem" aria-hidden="true" class="flex-shrink-0"><div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4"><img src="partners/15.png" alt="" class="w-full h-full object-contain" draggable="false"/></div></div>
-
-          </div><!-- /marquee-track -->
-        </div><!-- /marquee-wrapper -->
-
-      </section>
-      <!-- ═══ / СЕКЦИЯ ПАРТНЁРОВ ═══ -->
-
+    <div class="h-1.5 w-full bg-slate-200">
+      <div id="progressFill" class="h-full bg-brand-red" style="width:0%"></div>
     </div>
 
-    <!-- ═══ Privacy Policy Modal ═══ -->
-    <div id="privacyModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-      <!-- Overlay -->
-      <div class="absolute inset-0 bg-black/50" id="privacyOverlay"></div>
-      
-      <!-- Content -->
-      <div class="bg-white rounded-2xl max-w-2xl max-h-[80vh] overflow-y-auto p-6 relative shadow-2xl anim-scale-in">
-        <button type="button" id="closePrivacyModalBtn" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
+    <main id="stepContainer" class="flex flex-1 flex-col items-center justify-center px-5 py-12 sm:px-8">
+    </main>
 
-        <div class="prose prose-slate max-w-none">
-          <h2 class="text-2xl font-black text-brand-blue uppercase tracking-tight mb-2">Privacy Policy</h2>
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Big City HVAC & Appliance Repair · Effective Date: 04/06/2026</p>
+    <!-- ═══ СЕКЦИЯ ПАРТНЁРОВ ═══ -->
+    <section class="w-full bg-[#2868d7] py-10 overflow-hidden" aria-label="Our Partners">
 
-          <div class="space-y-6 text-sm text-slate-600 leading-relaxed">
-            <section>
-              <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">1. Overview</h3>
-              <p>Big City HVAC & Appliance Repair (“we”, “us”, or “our”) values your privacy. This Privacy Policy explains how we collect and use information through our website and HVAC estimate calculator.</p>
-            </section>
+      <!-- Заголовок -->
+      <div class="flex items-center gap-4 mb-8 px-5 sm:px-8">
+        <span class="block w-1.5 h-14 rounded-full bg-brand-red flex-shrink-0"></span>
+        <h2 class="font-display text-5xl sm:text-6xl font-black uppercase tracking-tight text-white leading-none">
+          Our Partners
+        </h2>
+      </div>
 
-            <section>
-              <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">2. Information We Collect</h3>
-              <p>When you use our calculator or request an estimate, we may collect:</p>
-              <ul class="list-disc pl-5 space-y-1">
-                <li>Name, Phone number, Email address</li>
-                <li>Property address</li>
-                <li>Project details (home size, system type, etc.)</li>
-              </ul>
-              <p class="mt-2">We may also automatically collect: IP address, Device/browser info, Basic usage data (analytics).</p>
-            </section>
+      <!-- Обёртка: overflow-hidden обрезает трек по краям -->
+      <div class="marquee-wrapper overflow-hidden">
 
-            <section>
-              <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">3. How We Use Information</h3>
-              <p>We use your information strictly to:</p>
-              <ul class="list-disc pl-5 space-y-1">
-                <li>Generate HVAC estimates</li>
-                <li>Contact you about your request</li>
-                <li>Schedule service or consultation</li>
-                <li>Improve our tools and services</li>
-              </ul>
-              <p class="mt-2 text-brand-blue font-bold">We do not sell or share your personal information for marketing to third parties.</p>
-            </section>
+        <!-- Трек: 30 логотипов (15 оригинальных + 15 дублей для бесшовного лупа) -->
+        <div class="marquee-track" role="list" aria-label="Логотипы партнёров">
 
-            <section>
-              <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">4. Data Sharing</h3>
-              <p>We may share data only with: Our internal team, Tools we use to operate the business (CRM, scheduling software). All data is used solely to provide our services.</p>
-            </section>
-
-            <section>
-              <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">5. California Privacy Rights</h3>
-              <p>If you are a California resident, you have the right to:</p>
-              <ul class="list-disc pl-5 space-y-1">
-                <li>Request access to your data</li>
-                <li>Request deletion of your data</li>
-                <li>Request correction of your data</li>
-              </ul>
-            </section>
-
-            <section>
-              <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">6. Cookies</h3>
-              <p>We may use cookies to improve website performance and track usage. You can disable cookies in your browser settings.</p>
-            </section>
-
-            <section>
-              <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">7. Data Security</h3>
-              <p>We take reasonable steps to protect your information. However, no system is completely secure.</p>
-            </section>
-
-            <section>
-              <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">8. Data Retention</h3>
-              <p>We keep your information only as long as needed to: Provide services, Follow legal requirements.</p>
-            </section>
-
-            <section>
-              <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">9. Updates</h3>
-              <p>We may update this policy. Updates will be posted on this page.</p>
-            </section>
-
-            <section class="pt-6 border-t border-slate-100">
-              <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">10. Contact</h3>
-              <p class="font-bold">Big City HVAC & Appliance Repair</p>
-              <p>San Diego, CA</p>
-              <p class="text-brand-red font-black">📞 858-261-4011</p>
-            </section>
+          <!-- ── Оригинальный набор (1–15) ── -->
+          <div role="listitem" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/1.png" alt="Partner 1" class="w-full h-full object-contain" draggable="false" /></div>
           </div>
+          <div role="listitem" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/2.png" alt="Partner 2" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+          <div role="listitem" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/3.png" alt="Partner 3" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+          <div role="listitem" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/4.png" alt="Partner 4" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+          <div role="listitem" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/5.png" alt="Partner 5" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+          <div role="listitem" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/6.png" alt="Partner 6" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+          <div role="listitem" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/7.png" alt="Partner 7" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+          <div role="listitem" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/8.png" alt="Partner 8" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+          <div role="listitem" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/9.png" alt="Partner 9" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+          <div role="listitem" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/10.png" alt="Partner 10" class="w-full h-full object-contain" draggable="false" />
+            </div>
+          </div>
+          <div role="listitem" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/11.png" alt="Partner 11" class="w-full h-full object-contain" draggable="false" />
+            </div>
+          </div>
+          <div role="listitem" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/12.png" alt="Partner 12" class="w-full h-full object-contain" draggable="false" />
+            </div>
+          </div>
+          <div role="listitem" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/13.png" alt="Partner 13" class="w-full h-full object-contain" draggable="false" />
+            </div>
+          </div>
+          <div role="listitem" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/14.png" alt="Partner 14" class="w-full h-full object-contain" draggable="false" />
+            </div>
+          </div>
+          <div role="listitem" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/15.png" alt="Partner 15" class="w-full h-full object-contain" draggable="false" />
+            </div>
+          </div>
+
+          <!-- ── Дублированный набор (1–15) — нужен для бесшовного лупа ── -->
+          <div role="listitem" aria-hidden="true" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/1.png" alt="" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+          <div role="listitem" aria-hidden="true" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/2.png" alt="" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+          <div role="listitem" aria-hidden="true" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/3.png" alt="" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+          <div role="listitem" aria-hidden="true" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/4.png" alt="" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+          <div role="listitem" aria-hidden="true" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/5.png" alt="" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+          <div role="listitem" aria-hidden="true" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/6.png" alt="" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+          <div role="listitem" aria-hidden="true" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/7.png" alt="" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+          <div role="listitem" aria-hidden="true" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/8.png" alt="" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+          <div role="listitem" aria-hidden="true" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/9.png" alt="" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+          <div role="listitem" aria-hidden="true" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/10.png" alt="" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+          <div role="listitem" aria-hidden="true" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/11.png" alt="" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+          <div role="listitem" aria-hidden="true" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/12.png" alt="" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+          <div role="listitem" aria-hidden="true" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/13.png" alt="" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+          <div role="listitem" aria-hidden="true" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/14.png" alt="" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+          <div role="listitem" aria-hidden="true" class="flex-shrink-0">
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white flex items-center justify-center shadow-xl p-4">
+              <img src="partners/15.png" alt="" class="w-full h-full object-contain" draggable="false" /></div>
+          </div>
+
+        </div><!-- /marquee-track -->
+      </div><!-- /marquee-wrapper -->
+
+    </section>
+    <!-- ═══ / СЕКЦИЯ ПАРТНЁРОВ ═══ -->
+
+  </div>
+
+  <!-- ═══ Privacy Policy Modal ═══ -->
+  <div id="privacyModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <!-- Overlay -->
+    <div class="absolute inset-0 bg-black/50" id="privacyOverlay"></div>
+
+    <!-- Content -->
+    <div class="bg-white rounded-2xl max-w-2xl max-h-[80vh] overflow-y-auto p-6 relative shadow-2xl anim-scale-in">
+      <button type="button" id="closePrivacyModalBtn"
+        class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+
+      <div class="prose prose-slate max-w-none">
+        <h2 class="text-2xl font-black text-brand-blue uppercase tracking-tight mb-2">Privacy Policy</h2>
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Big City HVAC & Appliance Repair ·
+          Effective Date: 04/06/2026</p>
+
+        <div class="space-y-6 text-sm text-slate-600 leading-relaxed">
+          <section>
+            <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">1. Overview</h3>
+            <p>Big City HVAC & Appliance Repair (“we”, “us”, or “our”) values your privacy. This Privacy Policy explains
+              how we collect and use information through our website and HVAC estimate calculator.</p>
+          </section>
+
+          <section>
+            <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">2. Information We Collect</h3>
+            <p>When you use our calculator or request an estimate, we may collect:</p>
+            <ul class="list-disc pl-5 space-y-1">
+              <li>Name, Phone number, Email address</li>
+              <li>Property address</li>
+              <li>Project details (home size, system type, etc.)</li>
+            </ul>
+            <p class="mt-2">We may also automatically collect: IP address, Device/browser info, Basic usage data
+              (analytics).</p>
+          </section>
+
+          <section>
+            <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">3. How We Use Information</h3>
+            <p>We use your information strictly to:</p>
+            <ul class="list-disc pl-5 space-y-1">
+              <li>Generate HVAC estimates</li>
+              <li>Contact you about your request</li>
+              <li>Schedule service or consultation</li>
+              <li>Improve our tools and services</li>
+            </ul>
+            <p class="mt-2 text-brand-blue font-bold">We do not sell or share your personal information for marketing to
+              third parties.</p>
+          </section>
+
+          <section>
+            <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">4. Data Sharing</h3>
+            <p>We may share data only with: Our internal team, Tools we use to operate the business (CRM, scheduling
+              software). All data is used solely to provide our services.</p>
+          </section>
+
+          <section>
+            <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">5. California Privacy Rights</h3>
+            <p>If you are a California resident, you have the right to:</p>
+            <ul class="list-disc pl-5 space-y-1">
+              <li>Request access to your data</li>
+              <li>Request deletion of your data</li>
+              <li>Request correction of your data</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">6. Cookies</h3>
+            <p>We may use cookies to improve website performance and track usage. You can disable cookies in your
+              browser settings.</p>
+          </section>
+
+          <section>
+            <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">7. Data Security</h3>
+            <p>We take reasonable steps to protect your information. However, no system is completely secure.</p>
+          </section>
+
+          <section>
+            <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">8. Data Retention</h3>
+            <p>We keep your information only as long as needed to: Provide services, Follow legal requirements.</p>
+          </section>
+
+          <section>
+            <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">9. Updates</h3>
+            <p>We may update this policy. Updates will be posted on this page.</p>
+          </section>
+
+          <section class="pt-6 border-t border-slate-100">
+            <h3 class="text-lg font-bold text-brand-blue uppercase tracking-wide mb-2">10. Contact</h3>
+            <p class="font-bold">Big City HVAC & Appliance Repair</p>
+            <p>San Diego, CA</p>
+            <p class="text-brand-red font-black">📞 858-261-4011</p>
+          </section>
         </div>
       </div>
     </div>
+  </div>
 
-    <script src="script.js"></script>
-  </body>
+  <script src="script.js"></script>
+</body>
+
 </html>

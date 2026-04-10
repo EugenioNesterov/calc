@@ -17,6 +17,28 @@ const answers = {
   privacyAgreed: false,
 };
 
+// ─── FormSubmit ──────────────────────────────────────
+const FORMSUBMIT_URL = "https://formsubmit.co/ajax/005mvv@gmail.com";
+
+async function sendLead(isUrgent = false) {
+  const payload = {
+    ...answers,
+    _subject: isUrgent
+      ? "URGENT: HVAC Lead Booked!"
+      : "New HVAC Lead (Viewing Quote)",
+    _captcha: "false",
+  };
+  try {
+    await fetch(FORMSUBMIT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(payload),
+    });
+  } catch (_) {
+    // Ошибки сети не блокируют UI
+  }
+}
+
 // Instead of a linear currentStep, we track our position in a dynamic path
 let pathIndex = 0; 
 
@@ -675,6 +697,8 @@ function attachListeners() {
     const bookBtn = document.getElementById("bookNowBtn");
     if (bookBtn) {
       bookBtn.addEventListener("click", () => {
+        // Отправляем «горячий» лид — пользователь нажал Book Now
+        sendLead(true);
         const stepContainer = document.getElementById("stepContainer");
         if (stepContainer) {
           stepContainer.innerHTML = `
@@ -683,7 +707,7 @@ function attachListeners() {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
               </svg>
               <h2 class="text-xl sm:text-2xl font-bold text-slate-800 text-center mb-6">
-                Our specialist will contact you within 2 minutes to help you choose the right solution.
+                Our specialist will contact you within a few minutes to help you choose the right solution.
               </h2>
               <p class="text-base italic text-slate-600 text-center mb-4 max-w-lg mx-auto">
                 "The mission of our company is to provide the most comfortable solution at a fair price — and ensure every customer is fully satisfied."
@@ -709,6 +733,8 @@ function advance(dir) {
   
   if (dir > 0) {
     if (pathIndex >= currentPath.length - 1) return;
+    // Отправляем «теплый» лид при завершении шага 7 (контактные данные)
+    if (currentPath[pathIndex] === 7) sendLead(false);
     pathIndex++;
   } else {
     if (pathIndex <= 0) return;
